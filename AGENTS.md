@@ -88,8 +88,8 @@ node scripts/build-recipes.mjs    # 食谱
 ```yaml
 ---
 id: 1
-title: 韭菜鸡蛋包
-headline: 在家蒸了一锅韭菜鸡蛋包（新手第一次）
+title: 韭菜鸡蛋胡萝卜包
+headline: 在家蒸了一锅韭菜鸡蛋胡萝卜包（新手第一次）
 series: 今天做______
 status: 脚本
 platforms: [小红书, 抖音, B站]
@@ -109,7 +109,7 @@ updated: 2026-09-27
 ```yaml
 ---
 id: 1
-name: 韭菜鸡蛋包
+name: 韭菜鸡蛋胡萝卜包
 category: 包子
 tags: [发面, 素馅, 蒸]
 difficulty: 简单

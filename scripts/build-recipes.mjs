@@ -57,7 +57,7 @@ for (const [cat, list] of byCat) {
 }
 
 out += `## 新增一个食谱\n\n`;
-out += '```bash\nnode scripts/new-recipe.mjs "韭菜鸡蛋包" --category "包子"\n```\n\n';
+out += '```bash\nnode scripts/new-recipe.mjs "韭菜鸡蛋胡萝卜包" --category "包子"\n```\n\n';
 out += `分类建议：包子 / 馒头花卷 / 饺子馄饨 / 面条 / 饼 / 馅料 / 基础面团 / 汤菜\n`;
 
 writeFileSync(indexPath, out);
