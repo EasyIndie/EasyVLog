@@ -48,11 +48,6 @@ const sections = [
     items: listDir('02-分集脚本', { order: ['00-分集索引.md'] }),
   },
   {
-    title: '拍摄手册',
-    icon: 'video',
-    items: listDir('03-拍摄手册'),
-  },
-  {
     title: '账号规划',
     icon: 'clipboard-list',
     items: listDir('01-账号规划', { order: ['01-定位与调性.md'] }),

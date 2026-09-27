@@ -42,7 +42,7 @@ if (!query) {
 }
 
 // 收集所有可选的 md（食谱库优先）
-const searchDirs = ['05-食谱库', '02-分集脚本', '03-拍摄手册', '01-账号规划', '04-运营记录'];
+const searchDirs = ['05-食谱库', '02-分集脚本', '01-账号规划', '04-运营记录'];
 const candidates = [];
 for (const dir of searchDirs) {
   const full = join(root, dir);
