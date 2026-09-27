@@ -17,6 +17,8 @@
   --line-strong: #b8b0a0;
   --zebra: #ece9e1;          /* 隔行底色，1.11:1，能看出来但不抢眼 */
   --code-bg: #efece6;
+  --pre-bg: #22262a;
+  --pre-ink: #eef1f3;
 
   --radius: 14px;
   --radius-sm: 10px;
@@ -60,6 +62,8 @@
   --scrollbar-hover: #48525c;
   --line-strong: #464f58;
   --zebra: #1e2328;
+  --pre-bg: #12161a;        /* 比 --surface 更深，代码块在深色下才有边界 */
+  --pre-ink: #e8ecef;
   color-scheme: dark;
 }
 
@@ -84,7 +88,6 @@ body {
   line-height: 1.8;
   /* 不要用 -webkit-font-smoothing: antialiased：它会把字重压细，
      中文笔画密，压细之后小字号下辨识度明显下降。用系统默认渲染。 */
-  text-rendering: optimizeLegibility;
 }
 
 a { color: var(--accent); }
@@ -104,9 +107,9 @@ button, a, input, .group-head, .pin, .icon-btn, .to-top { touch-action: manipula
   height: calc(var(--topbar-h) + env(safe-area-inset-top));
   padding: env(safe-area-inset-top) calc(12px + var(--sbw, 0px)) 0 12px;
   display: flex; align-items: center; gap: 10px;
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  backdrop-filter: saturate(1.6) blur(12px);
-  -webkit-backdrop-filter: saturate(1.6) blur(12px);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: saturate(1.4) blur(8px);
+  -webkit-backdrop-filter: saturate(1.4) blur(8px);
   border-bottom: 1px solid var(--line);
   z-index: 40;
 }
@@ -124,10 +127,10 @@ button, a, input, .group-head, .pin, .icon-btn, .to-top { touch-action: manipula
   font-size: 12px; color: var(--muted);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 42vw;
 }
-.actions { display: flex; gap: 6px; }
+.actions { display: flex; gap: 8px; }
 
 .icon-btn {
-  width: 40px; height: 40px; flex: none;
+  width: 44px; height: 44px; flex: none;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--surface-2);
@@ -226,7 +229,7 @@ body.nav-open #sidebar { transform: translateX(0); }
 
 #nav a {
   display: block; position: relative;
-  padding: 8px 12px 8px 14px; margin: 1px 0;
+  padding: 11.5px 12px 11.5px 14px; margin: 1px 0;
   border-radius: var(--radius-sm);
   color: var(--ink-2); text-decoration: none;
   font-size: 14px; line-height: 1.5;
@@ -239,7 +242,7 @@ body.nav-open #sidebar { transform: translateX(0); }
 }
 #nav a:hover { background: var(--surface-2); }
 #nav a.active { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
-#nav a.active::before { height: 20px; }
+#nav a.active::before { height: 22px; }
 #nav a.hidden { display: none; }
 #nav .empty { color: var(--muted); font-size: 14px; padding: 12px; }
 
@@ -314,7 +317,7 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
   font-size: .9em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 .md pre {
-  background: #22262a; color: #eef1f3;
+  background: var(--pre-bg); color: var(--pre-ink);
   padding: 14px 16px; border-radius: var(--radius-sm); overflow-x: auto;
   font-size: 14.5px; line-height: 1.6;
 }
@@ -326,13 +329,56 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
   /* 食材表是“照着称重”要用的，字号不能再小于正文 */
   font-size: 1em;
 }
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1em 0; border-radius: var(--radius-sm); }
+.table-wrap { position: relative; margin: 1em 0; border-radius: var(--radius-sm); overflow: hidden; }
+.table-x { overflow-x: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .table-wrap table { margin: 0; white-space: nowrap; }
+/*
+ * 右缘渐隐：只在「能横滑」且「还没滑到底」时出现，暗示右边还有列。
+ * 必须挂在 .table-wrap（非滚动层）上—— 如果把渐隐画在滚动容器里，
+ * 它会跟着内容一起横向滚走。所以表格外面套了两层。
+ */
+.table-wrap::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 32px;
+  background: linear-gradient(to right, transparent, var(--bg));
+  pointer-events: none; opacity: 0; transition: opacity .18s;
+}
+.table-wrap.scrollable::after { opacity: 1; }
+.table-wrap.scrollable.at-end::after { opacity: 0; }
 .md th, .md td { border: 1px solid var(--line-strong); padding: 9px 13px; text-align: left; font-variant-numeric: tabular-nums; }
 .md th { background: var(--surface-2); font-weight: 650; }
 .md tbody tr:nth-child(even) td { background: var(--zebra); }
 /* 仅“材料 / 用量”表（由 decorateTables() 打标）：用量列加重，方便纵向比数 */
 .md table.t-ing td:nth-child(2) { font-weight: 600; }
+
+/* 标题锚点：点一下把这一节的链接复制走。桌面 hover 才明显，触屏常驻半透明 */
+.md h2, .md h3 { position: relative; }
+.h-anchor {
+  position: absolute; right: 0; top: 50%; translate: 0 -50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px;
+  color: var(--muted); text-decoration: none;
+  opacity: 0; transition: opacity .15s, background .15s, color .15s;
+}
+.h-anchor .ic { width: 16px; height: 16px; }
+.md h2:hover .h-anchor, .md h2:focus-within .h-anchor,
+.md h3:hover .h-anchor, .md h3:focus-within .h-anchor { opacity: .7; }
+.h-anchor:hover { opacity: 1; background: var(--accent-soft); color: var(--accent-ink); }
+/* 触屏没有 hover，常驻显示否则发现不了 */
+@media (hover: none) { .h-anchor { opacity: .3; } }
+
+/* 食谱信息条：由 front matter 生成，取代原来「一行一个事实」的 bullet 列表 */
+.meta-bar {
+  display: flex; flex-wrap: wrap; gap: 7px;
+  margin: 0 0 1.7em;
+}
+.meta-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px 5px 10px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); color: var(--ink-2);
+  font-size: .82em; line-height: 1.6; white-space: nowrap;
+}
+.meta-chip .ic { width: 14px; height: 14px; color: var(--muted); }
 
 .md input[type=checkbox] { width: 17px; height: 17px; vertical-align: -3px; accent-color: var(--accent); }
 .md img { max-width: 100%; border-radius: var(--radius-sm); }
@@ -413,9 +459,9 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
   position: fixed; left: 0; right: 0; bottom: 0;
   height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  backdrop-filter: saturate(1.6) blur(12px);
-  -webkit-backdrop-filter: saturate(1.6) blur(12px);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: saturate(1.4) blur(8px);
+  -webkit-backdrop-filter: saturate(1.4) blur(8px);
   border-top: 1px solid var(--line);
   z-index: 45;
 }
@@ -494,14 +540,17 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 
 /* ============ 计时器 ============ */
 .dur {
+  position: relative;
   display: inline-flex; align-items: center; gap: 3px;
-  margin: 0 1px; padding: 0 8px 0 6px;
+  margin: 0 1px; padding: 1px 9px 1px 7px;
   border: 1px solid var(--accent-line); border-radius: 999px;
   background: var(--accent-soft); color: var(--accent-ink);
-  font: inherit; font-size: .92em; font-weight: 600; line-height: 1.7;
+  font: inherit; font-size: .92em; font-weight: 600; line-height: 1.95;
   cursor: pointer; white-space: nowrap; touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+/* 视觉上还是小芯片，但把命中区撑到 44px——做菜时手上有水，点不准 */
+.dur::after { content: ""; position: absolute; inset: -6px -3px; }
 .dur:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 .dur .ic { width: 14px; height: 14px; opacity: .85; }
 
@@ -624,25 +673,25 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
 /* ============ 滚动锁定 / 防穿透 ============ */
 body.nav-open, body.timer-open { overflow: hidden; }
 #backdrop, .timer-backdrop { touch-action: none; }
-#nav, .tp-list, .table-wrap, .md pre { overscroll-behavior: contain; }
+#nav, .tp-list, .table-x, .md pre { overscroll-behavior: contain; }
 
 /* ============ 滚动条（细、自动隐藏、跟随主题） ============ */
 #nav::-webkit-scrollbar, .tp-list::-webkit-scrollbar,
-.table-wrap::-webkit-scrollbar, .md pre::-webkit-scrollbar {
+.table-x::-webkit-scrollbar, .md pre::-webkit-scrollbar {
   width: 8px; height: 8px;
 }
 #nav::-webkit-scrollbar-track, .tp-list::-webkit-scrollbar-track,
-.table-wrap::-webkit-scrollbar-track, .md pre::-webkit-scrollbar-track { background: transparent; }
+.table-x::-webkit-scrollbar-track, .md pre::-webkit-scrollbar-track { background: transparent; }
 #nav::-webkit-scrollbar-thumb, .tp-list::-webkit-scrollbar-thumb,
-.table-wrap::-webkit-scrollbar-thumb, .md pre::-webkit-scrollbar-thumb {
+.table-x::-webkit-scrollbar-thumb, .md pre::-webkit-scrollbar-thumb {
   background: transparent; border-radius: 8px;
 }
 #nav:hover::-webkit-scrollbar-thumb, #nav.scrolling::-webkit-scrollbar-thumb,
 .tp-list:hover::-webkit-scrollbar-thumb,
-.table-wrap:hover::-webkit-scrollbar-thumb,
+.table-x:hover::-webkit-scrollbar-thumb,
 .md pre:hover::-webkit-scrollbar-thumb { background: var(--scrollbar); }
 #nav::-webkit-scrollbar-thumb:hover, .tp-list::-webkit-scrollbar-thumb:hover,
-.table-wrap::-webkit-scrollbar-thumb:hover,
+.table-x::-webkit-scrollbar-thumb:hover,
 .md pre::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
 
 /* ============ 按下反馈 ============ */
@@ -699,7 +748,7 @@ input[type="number"] { -moz-appearance: textfield; }
   .md pre { background: #f3f3f3 !important; color: #111 !important; }
   .md code { background: #f0f0f0 !important; }
   .md table { white-space: normal; display: table; width: 100%; }
-  .table-wrap { overflow: visible !important; }
+  .table-wrap, .table-x { overflow: visible !important; }
   .md a { color: #000 !important; text-decoration: none; }
   .md h1, .md h2, .md h3 { break-after: avoid; }
   .md tr, .md li, .md blockquote { break-inside: avoid; }

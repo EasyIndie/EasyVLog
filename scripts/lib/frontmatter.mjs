@@ -39,3 +39,18 @@ export function readMarkdownDir(dir, { exclude = [] } = {}) {
   }
   return out;
 }
+
+/**
+ * 160 分钟 → 2 小时 40 分；已经是自由文本（如「约 2.5–3 小时」）就原样返回。
+ * assets/app.js 里有一份同样的实现给浏览器用，改了记得对齐。
+ */
+export function fmtDuration(v) {
+  const s = String(v ?? '').trim();
+  const m = /^(\d+)\s*分钟?$/.exec(s);
+  if (!m) return s;
+  const n = +m[1];
+  if (n < 60) return `${n} 分钟`;
+  const h = Math.floor(n / 60);
+  const mm = n % 60;
+  return `${h} 小时${mm ? ' ' + mm + ' 分' : ''}`;
+}

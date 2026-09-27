@@ -17,10 +17,10 @@
  * 前置：先跑 build-recipes / build-index / build-site（生成 site.json）。
  */
 import { readFileSync, writeFileSync, mkdirSync, rmSync, cpSync, existsSync, readdirSync, statSync } from 'node:fs';
-import { join, dirname, relative, sep } from 'node:path';
+import { join, dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { parseFrontMatter } from './lib/frontmatter.mjs';
+import { parseFrontMatter, fmtDuration } from './lib/frontmatter.mjs';
 
 const require = createRequire(import.meta.url);
 const marked = require('../assets/marked.min.js');
@@ -33,7 +33,8 @@ function arg(name, fallback) {
   return i > -1 && process.argv[i + 1] ? process.argv[i + 1] : fallback;
 }
 const BASE = arg('base', '/easyvlog/').replace(/\/?$/, '/');
-const OUT = join(root, arg('out', '_site'));
+/* 用 resolve 而不是 join：join 会把 '/tmp/x' 拼成 '<root>/tmp/x' */
+const OUT = resolve(root, arg('out', '_site'));
 const VERSION = process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'dev';
 const SITE_ORIGIN = 'https://easyindie.github.io';
 
@@ -126,7 +127,7 @@ function renderMarkdown(mdText, docPath) {
   let out = html;
 
   // 表格包一层，移动端才敢横向滚
-  out = out.replace(/<table>[\s\S]*?<\/table>/g, (m) => `<div class="table-wrap">${m}</div>`);
+  out = out.replace(/<table>[\s\S]*?<\/table>/g, (m) => `<div class="table-wrap"><div class="table-x">${m}</div></div>`);
 
   // 标题加 id，和 app.js 的 slug() 保持一致
   out = out.replace(/<(h[1-4])>([\s\S]*?)<\/\1>/g, (m, tag, inner) => {
@@ -196,6 +197,42 @@ function isoDuration(text) {
   const h = Math.floor(mins / 60), mm = mins % 60;
   return 'PT' + (h ? h + 'H' : '') + (mm ? mm + 'M' : h ? '' : '0M');
 }
+/*
+ * 食谱信息条：份量 / 耗时 / 难度 / 分类 / 关联视频。
+ * 数据全部取自 front matter——正文里不再重复写这几行，避免两处不一致。
+ * 少于 3 项就不插（说明不是食谱页，比如账号规划文档）。
+ * assets/app.js 里有一份同样的实现给前端渲染用，改了要对齐。
+ */
+const META_FIELDS = [
+  { key: 'servings', icon: 'ic-utensils' },
+  { key: 'time', icon: 'ic-timer', fmt: fmtDuration },
+  { key: 'difficulty', icon: 'ic-bar-chart-3' },
+  { key: 'category', icon: 'ic-chef-hat' },
+  { key: 'source', icon: 'ic-video' },
+];
+function buildMetaBar(fm) {
+  if (!fm) return '';
+  const chips = [];
+  for (const f of META_FIELDS) {
+    const v = fm[f.key];
+    if (v == null || v === '') continue;
+    const txt = f.fmt ? f.fmt(v) : String(v);
+    if (!txt) continue;
+    chips.push(
+      `<span class="meta-chip"><svg class="ic" aria-hidden="true"><use href="#${f.icon}"/></svg>${esc(txt)}</span>`
+    );
+  }
+  if (chips.length < 3) return '';
+  return `<div class="meta-bar">${chips.join('')}</div>`;
+}
+function insertMetaBar(html, fm) {
+  const bar = buildMetaBar(fm);
+  if (!bar) return html;
+  const i = html.indexOf('</h1>');
+  if (i === -1) return bar + html;
+  return html.slice(0, i + 5) + bar + html.slice(i + 5);
+}
+
 function buildJsonLd({ fm, docPath, title, ingredients, steps }) {
   const isRecipe = docPath.startsWith('05-食谱库/');
   const url = SITE_ORIGIN + pageUrl(docPath);
@@ -268,7 +305,7 @@ function makePage(docPath) {
     .replace(/__JSONLD__/g, JSON.stringify(jsonLd, null, 2).replace(/<\//g, '<\\/'));
 
   html = html.replace(/(<main id="content">)[\s\S]*?(<\/main>)/,
-    (m, a, b) => a + '<article class="md">' + body + '</article>' + b);
+    (m, a, b) => a + '<article class="md">' + insertMetaBar(body, fm) + '</article>' + b);
   return html;
 }
 

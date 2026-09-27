@@ -18,6 +18,8 @@
   var SITE = null;
   var allLinks = [];
   var titles = {};
+  var baseTitle = '私人食谱库';   // 顶栏副标题的“本名”，滚动时才临时换成小节名
+  var curSection = null;
   var groupState = {}; // 分组标题 -> 是否展开
   var sectionsByKey = {};
 
@@ -234,7 +236,9 @@
       a.classList.toggle('active', on);
       if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
-    if (docTitle) docTitle.textContent = titles[path] || '私人食谱库';
+    baseTitle = titles[path] || '私人食谱库';
+    curSection = null;
+    if (docTitle) docTitle.textContent = baseTitle;
     updateTabs(path);
   }
   function updateTabs(path) {
@@ -290,6 +294,71 @@
       if (m) return md.slice(m[0].length);
     }
     return md;
+  }
+  /** 极简 front matter 解析，必须和 scripts/lib/frontmatter.mjs 保持一致 */
+  function parseFrontMatter(md) {
+    var m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(md || '');
+    if (!m) return null;
+    var data = {};
+    m[1].split(/\r?\n/).forEach(function (line) {
+      var t = line.trim();
+      if (!t || t.charAt(0) === '#') return;
+      var i = line.indexOf(':');
+      if (i === -1) return;
+      var key = line.slice(0, i).trim();
+      var val = line.slice(i + 1).trim();
+      if (val.charAt(0) === '[' && val.charAt(val.length - 1) === ']') {
+        val = val.slice(1, -1).split(',').map(function (s) {
+          return s.trim().replace(/^["']|["']$/g, '');
+        }).filter(Boolean);
+      } else {
+        val = val.replace(/^["']|["']$/g, '');
+      }
+      data[key] = val;
+    });
+    return data;
+  }
+  /** 160 分钟 → 2 小时 40 分。已经是自由文本就原样返回。
+      同一条规则写在 scripts/lib/frontmatter.mjs 的 fmtDuration()，改了要对齐。 */
+  function fmtDuration(v) {
+    var m = /^(\d+)\s*分钟?$/.exec(String(v == null ? '' : v).trim());
+    if (!m) return String(v == null ? '' : v).trim();
+    var n = +m[1];
+    if (n < 60) return n + ' 分钟';
+    var h = Math.floor(n / 60), mm = n % 60;
+    return h + ' 小时' + (mm ? ' ' + mm + ' 分' : '');
+  }
+
+  /* 食谱信息条：数据全部来自 front matter，正文里不再重复写 */
+  var META_FIELDS = [
+    { key: 'servings', icon: 'ic-utensils' },
+    { key: 'time', icon: 'ic-timer', fmt: fmtDuration },
+    { key: 'difficulty', icon: 'ic-bar-chart-3' },
+    { key: 'category', icon: 'ic-chef-hat' },
+    { key: 'source', icon: 'ic-video' }
+  ];
+  function buildMetaBar(fm) {
+    if (!fm) return '';
+    var chips = [];
+    META_FIELDS.forEach(function (f) {
+      var v = fm[f.key];
+      if (v == null || v === '') return;
+      var txt = f.fmt ? f.fmt(v) : String(v);
+      if (!txt) return;
+      chips.push('<span class="meta-chip"><svg class="ic" aria-hidden="true"><use href="#' + f.icon + '"/></svg>' +
+        escapeHtml(txt) + '</span>');
+    });
+    /* 少于 3 项说明不是食谱页（例如账号规划文档），不插信息条 */
+    if (chips.length < 3) return '';
+    return '<div class="meta-bar">' + chips.join('') + '</div>';
+  }
+  /** 插在第一个 </h1> 后面；没有 h1 就放最前面 */
+  function insertMetaBar(html, fm) {
+    var bar = buildMetaBar(fm);
+    if (!bar) return html;
+    var i = html.indexOf('</h1>');
+    if (i === -1) return bar + html;
+    return html.slice(0, i + 5) + bar + html.slice(i + 5);
   }
   function slug(s) {
     return s.trim().toLowerCase().replace(/[^\w\u4e00-\u9fa5 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
@@ -485,13 +554,20 @@
 
   /** 内容已就位后的接线（预渲染页与前端渲染共用） */
   function hydrate(path) {
+    /* 表格外靁套两层：.table-wrap 负责定位 + 右缘渐隐，.table-x 负责横向滚动。
+       渐隐必须画在非滚动层上，否则会跟着内容一起滚走。 */
     content.querySelectorAll('table').forEach(function (t) {
-      if (!t.parentElement.classList.contains('table-wrap')) {
-        var w = document.createElement('div');
-        w.className = 'table-wrap';
-        t.parentNode.insertBefore(w, t);
-        w.appendChild(t);
+      var p = t.parentElement;
+      if (p && p.classList.contains('table-x')) return;
+      var x = document.createElement('div');
+      x.className = 'table-x';
+      if (p && p.classList.contains('table-wrap')) {
+        p.insertBefore(x, t); x.appendChild(t); return;
       }
+      var w = document.createElement('div');
+      w.className = 'table-wrap';
+      t.parentNode.insertBefore(w, t);
+      w.appendChild(x); x.appendChild(t);
     });
     content.querySelectorAll('h1,h2,h3,h4').forEach(function (h) { if (!h.id) h.id = slug(h.textContent); });
     content.querySelectorAll('img').forEach(function (img) {
@@ -510,14 +586,18 @@
 
     decorateSteps(content.querySelector('.md'));
     decorateTables(content.querySelector('.md'));
+    decorateHeadings(content.querySelector('.md'));
+    markScrollableTables(content);
+    scheduleSectionIndicator();
   }
 
   function render(mdText, path) {
+    var fm = parseFrontMatter(mdText);
     var body = stripFrontMatter(mdText);
     var html = (window.marked && typeof window.marked.parse === 'function')
       ? window.marked.parse(body)
       : '<pre>' + escapeHtml(body) + '</pre>';
-    content.innerHTML = '<article class="md">' + html + '</article>';
+    content.innerHTML = '<article class="md">' + insertMetaBar(html, fm) + '</article>';
     hydrate(path);
     scrollInstant(0);
     scrollToHash();
@@ -594,6 +674,7 @@
     var pct = max > 0 ? Math.min(100, Math.max(0, (doc.scrollTop / max) * 100)) : 0;
     if (progressBar) progressBar.style.width = pct + '%';
     if (toTop) toTop.classList.toggle('show', doc.scrollTop > 500);
+    scheduleSectionIndicator();
   }
   window.addEventListener('scroll', updateProgress, { passive: true });
   toTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
@@ -975,6 +1056,100 @@
       }
     });
   }
+  /* 表格右缘渐隐：能横滑才显示，滑到底就收起 */
+  function markScrollableTables(root) {
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('.table-wrap'), function (w) {
+      var x = w.querySelector('.table-x');
+      if (!x) return;
+      var can = x.scrollWidth > x.clientWidth + 1;
+      w.classList.toggle('scrollable', can);
+      w.classList.toggle('at-end', !can || x.scrollLeft + x.clientWidth >= x.scrollWidth - 1);
+    });
+  }
+  /* scroll 事件不冒泡，用捕获阶段统一接 */
+  document.addEventListener('scroll', function (ev) {
+    var x = ev.target;
+    if (!x || !x.classList || !x.classList.contains('table-x')) return;
+    var w = x.parentElement;
+    if (w) w.classList.toggle('at-end', x.scrollLeft + x.clientWidth >= x.scrollWidth - 1);
+  }, true);
+  var tableResizeTimer = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(tableResizeTimer);
+    tableResizeTimer = setTimeout(function () { markScrollableTables(content); }, 150);
+  }, { passive: true });
+
+  /* 复制到剪贴板：优先 Clipboard API，不行就回落到 execCommand */
+  function copyText(t) {
+    function legacy() {
+      return new Promise(function (res, rej) {
+        try {
+          var ta = document.createElement('textarea');
+          ta.value = t; ta.setAttribute('readonly', '');
+          ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+          document.body.appendChild(ta); ta.select();
+          var ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          if (ok) res(); else rej(new Error('execCommand 不可用'));
+        } catch (e) { rej(e); }
+      });
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(t).catch(legacy);
+    }
+    return legacy();
+  }
+
+  /* 标题锚点：点一下把这一节的链接复制走。
+     只给 h2/h3 加——h1 就是页面本身，给它一个锚点没意义；
+     但 data-label 要全置上，顶栏小节指示要用。 */
+  function decorateHeadings(root) {
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('h1, h2, h3'), function (h) {
+      if (!h.dataset.label) h.dataset.label = h.textContent.trim();
+      if (/^H1$/.test(h.tagName)) return;
+      if (!h.id || h.querySelector('.h-anchor')) return;
+      var a = document.createElement('a');
+      a.className = 'h-anchor';
+      a.href = '#' + h.id;
+      a.setAttribute('aria-label', '复制「' + h.dataset.label + '」的链接');
+      a.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#ic-link"/></svg>';
+      a.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        var url = location.href.split('#')[0] + '#' + encodeURIComponent(h.id);
+        try { history.replaceState(null, '', '#' + h.id); } catch (e) {}
+        copyText(url).then(function () {
+          showToast({ icon: 'check', title: '链接已复制', text: h.dataset.label });
+        }, function () {
+          showToast({ icon: 'info', title: '复制失败', text: '手动复制地址栏吧' });
+        });
+      });
+      h.appendChild(a);
+    });
+  }
+
+  /* 滚动时把顶栏副标题换成当前小节名，否则滚下去就不知道在哪一节 */
+  var secRaf = 0;
+  function scheduleSectionIndicator() {
+    if (secRaf || !window.requestAnimationFrame) return;
+    secRaf = window.requestAnimationFrame(function () { secRaf = 0; updateSectionIndicator(); });
+  }
+  function updateSectionIndicator() {
+    if (!docTitle) return;
+    var hs = content.querySelectorAll('.md h1, .md h2, .md h3');
+    if (!hs.length) return;
+    var bar = document.querySelector('.topbar');
+    var line = (bar ? bar.getBoundingClientRect().bottom : 58) + 10;
+    var cur = null;
+    for (var i = 0; i < hs.length; i++) {
+      if (hs[i].getBoundingClientRect().top <= line) cur = hs[i];
+      else break;
+    }
+    var txt = (cur && cur.dataset.label) ? cur.dataset.label : baseTitle;
+    if (txt !== curSection) { curSection = txt; docTitle.textContent = txt; }
+  }
+
   /* 仅在「步骤 / 做法」段落里把时长变成可点倒计时 */
   function decorateSteps(root) {
     if (!root) return;

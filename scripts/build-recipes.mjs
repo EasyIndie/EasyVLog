@@ -7,7 +7,7 @@
 import { writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { readMarkdownDir } from './lib/frontmatter.mjs';
+import { readMarkdownDir, fmtDuration } from './lib/frontmatter.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dir = join(root, '05-食谱库');
@@ -51,7 +51,7 @@ for (const [cat, list] of byCat) {
   out += `| 名称 | 难度 | 耗时 | 份量 | 关联 |\n|---|---|---|---|---|\n`;
   for (const r of list) {
     const d = r.data;
-    out += `| [${d.name}](${r.file}) | ${d.difficulty || ''} | ${d.time || ''} | ${d.servings || ''} | ${d.source || ''} |\n`;
+    out += `| [${d.name}](${r.file}) | ${d.difficulty || ''} | ${fmtDuration(d.time)} | ${d.servings || ''} | ${d.source || ''} |\n`;
   }
   out += `\n`;
 }
