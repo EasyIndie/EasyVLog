@@ -81,18 +81,26 @@ EasyVLog/
 ├── data/
 │   └── backlog.json              ← 选题池（未建脚本的剧集）
 │
-├── index.html                    ← 🌐 在线站入口（GitHub Pages）
+├── index.html                    ← 🌐 站点模板（构建时套用，见《在线查看》）
+├── manifest.webmanifest          ← PWA 清单（可加到主屏幕）
+├── robots.txt / sitemap.xml      ← SEO（sitemap 构建时重新生成）
+├── 404.html                      ← 错误页
+├── LICENSE                       ← 内容 CC BY-NC-SA 4.0 / 代码 MIT
+├── 站点审计.md                   ← 站点工程侧待办与优化清单
 ├── site.json                     ← 自动生成的导航清单
 ├── .nojekyll                     ← 让 Pages 原样提供 .md
 ├── .github/workflows/            ← 推 main 自动构建部署 Pages
-├── assets/                       ← 站点样式/脚本/marked
+├── assets/                       ← 样式 / 脚本 / marked / 图标
 │
 ├── scripts/
 │   ├── build-index.mjs           ← 重建分集索引
 │   ├── new-episode.mjs           ← 新建一集
 │   ├── build-recipes.mjs         ← 重建食谱索引
 │   ├── new-recipe.mjs            ← 新建食谱卡
-│   ├── build-site.mjs            ← 重建在线站导航
+│   ├── build-site.mjs            ← 重建在线站导航 site.json
+│   ├── build-static.mjs          ← 把每篇文档渲染成真 HTML，并组装 _site/
+│   ├── make-icons.py             ← 重新生成 favicon / 图标 / 分享图
+│   ├── preview.sh                ← 本地构建 + 预览
 │   ├── lib/frontmatter.mjs       ← front matter 解析
 │   └── look.sh                   ← glow 浏览文档
 │
@@ -127,7 +135,7 @@ EasyVLog/
 
 **看食谱不熄屏**：点顶栏 ☀ 开启「屏幕常亮」（Wake Lock）。开关会被记住，页面切回时自动续上。部分旧浏览器不支持。
 
-**单手操作**：手机上导航在**底部标签栏**（目录 / 今日 / 食谱 / 脚本），「目录」为**中部浮层**（再点「目录」或 ✕ 关闭，打开时背景锁定不滚动）；桌面端为左侧栏，可点顶栏左侧按钮**收起/展开**。
+**单手操作**：手机上导航在**底部标签栏**（目录 / 今日 / 食谱 / 脚本），「目录」为**底部上滑面板**（拖动顶部把手下滑、轻点把手、点遮罩，或再点「目录」都能关；打开时背景锁定不滚动）；桌面端为左侧栏，可点顶栏右侧按钮**收起/展开**。
 
 **图标**：全部按钮使用统一 SVG 图标（Lucide），随字体缩放、深浅色一致。
 
@@ -148,8 +156,24 @@ git add -A && git commit -m "内容: ..." && git push
 
 本地预览（可选）：
 ```bash
-node scripts/build-site.mjs && python3 -m http.server 8000
+./scripts/preview.sh          # 构建到 _site/ 并起服务，默认 http://127.0.0.1:8000
+./scripts/preview.sh 8080     # 指定端口
 ```
+
+**站点是怎么生成的**：`index.html` 是一张**模板**（带 `__BASE__` / `__TITLE__` / `__BODY__` 占位符）。
+`node scripts/build-static.mjs` 会把每篇 Markdown 渲染成真 HTML，输出：
+
+```
+_site/index.html                                   ← 首页 = 今日要做
+_site/05-食谱库/韭菜鸡蛋胡萝卜包/index.html          ← 每篇文档一个真页面
+_site/05-食谱库/韭菜鸡蛋胡萝卜包.md                  ← 原始 Markdown（前端切页时用）
+_site/sitemap.xml                                  ← 覆盖全部文档
+```
+
+意义：搜索引擎和分享爬虫能直接读到正文；前端 `assets/app.js` 只做**渐进增强**（接管跳转、给步骤加计时芯片）。
+所以直接双击打开仓库里的 `index.html` 是**没用**的（占位符没替换），请用 `./scripts/preview.sh`。
+
+**键盘快捷键**（桌面）：`/` 聚焦搜索、`Esc` 关面板/清空搜索、`j` / `k` 上下篇。
 
 ---
 

@@ -58,10 +58,14 @@
 | `05-食谱库/_模板.md` | 新食谱模板 | 手写 |
 | `data/backlog.json` | 选题池（未建脚本的剧集） | 手写 |
 | `data/today.json` | 站点「今日要做」指向 | 手写/脚本 |
-| `index.html` + `assets/` | 在线站（GitHub Pages，手机可看） | 手写 |
+| `index.html` + `assets/` | 在线站**模板**与样式/脚本（`index.html` 带占位符，不能直接双击打开） | 手写 |
+| `scripts/build-static.mjs` | 把每篇文档渲染成真 HTML 并组装 `_site/`（SEO 的关键） | 代码 |
+| `sw.js` | Service Worker（离线可看），构建时注入版本号 | 手写 |
 | `site.json` | 在线站导航清单 | **自动生成，禁止手改** |
-| `manifest.webmanifest` + `robots.txt` + `sitemap.xml` + `404.html` | 在线站 PWA / SEO / 错误页 | 手写 |
+| `manifest.webmanifest` + `robots.txt` + `404.html` | 在线站 PWA / SEO / 错误页 | 手写 |
+| `_site/sitemap.xml` | **构建期生成**，勿手写；仓库根不放 | 生成物 |
 | `assets/favicon.*` `assets/icon-*.png` `assets/og.png` | 站点图标与分享图（用 `scripts/make-icons.py` 生成） | 生成物（已提交） |
+| `LICENSE` | 内容 CC BY-NC-SA 4.0 / 代码 MIT | 手写 |
 | `站点审计.md` | 站点工程侧待办与优化清单 | 手写 |
 | `.github/workflows/deploy-pages.yml` | 推 main 自动重建并部署 Pages | 手写 |
 | `scripts/` | 生成索引、脚手架、站点、查看工具 | 代码 |
@@ -87,6 +91,12 @@ node scripts/build-recipes.mjs    # 食谱
 node scripts/build-site.mjs       # 在线站导航
 ```
 不要手改 `00-分集索引.md`。
+
+**改完站点（`index.html` / `assets/` / `sw.js`），本地验证：**
+```bash
+./scripts/preview.sh              # 构建到 _site/ 并起服务，再开 http://127.0.0.1:8000
+```
+注意：`index.html` 现在是**模板**（带 `__BASE__` 等占位符），直接双击打开不会正常工作。
 
 ---
 
@@ -180,6 +190,9 @@ node scripts/new-episode.mjs "标题" --series "今天做______"
 | `node scripts/build-recipes.mjs` | 重建食谱索引 |
 | `node scripts/new-recipe.mjs "名称"` | 新建食谱卡 |
 | `node scripts/build-site.mjs` | 重建在线站导航（`site.json`） |
+| `node scripts/build-static.mjs` | 静态化：把每篇文档渲染成真 HTML 并组装 `_site/` |
+| `./scripts/preview.sh [端口]` | 本地构建 + 预览站点 |
+| `python3 scripts/make-icons.py` | 重新生成 favicon / PWA 图标 / 分享图 |
 | `node scripts/set-today.mjs "名称"` | 设置「今日要做」（置顶高亮） |
 | `git push`（main） | 触发 Actions 自动重建并部署 Pages |
 | `./scripts/look.sh` | TUI 浏览全部文档 |

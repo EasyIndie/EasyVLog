@@ -7,7 +7,6 @@
   var menuBtn = document.getElementById('menuBtn');
   var sidebarEl = document.getElementById('sidebar');
   var tabbar = document.querySelector('.tabbar');
-  var navClose = document.getElementById('navClose');
   var sidebarToggle = document.getElementById('sidebarToggle');
   var printBtn = document.getElementById('printBtn');
   var themeBtn = document.getElementById('themeBtn');
@@ -43,6 +42,7 @@
 
   /* ---------- 滚动条占位宽度（Safari/Chrome 经典滚动条会挤占右侧） ---------- */
   function updateSbw() {
+    if (scrollLocked) return; // 锁定时滚动条消失，不要把这时的值当基准
     var w = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
     document.documentElement.style.setProperty('--sbw', w + 'px');
   }
@@ -50,6 +50,21 @@
   window.addEventListener('resize', updateSbw);
   window.addEventListener('orientationchange', function () { setTimeout(updateSbw, 120); });
   if (window.ResizeObserver) new ResizeObserver(updateSbw).observe(document.documentElement);
+
+  /* ---------- 软键盘高度 ----------
+   * iOS 弹出键盘时只改变 visual viewport，layout viewport 不动，
+   * 所以 fixed 定位的底部面板会被键盘盖住。用 --kb 把它顶上去。
+   */
+  function updateKeyboardInset() {
+    var vv = window.visualViewport;
+    var kb = 0;
+    if (vv) kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    // 小于 120px 基本是浏览器工具栏的误差，不算键盘
+    document.documentElement.style.setProperty('--kb', kb > 120 ? kb + 'px' : '0px');
+  }
+  updateKeyboardInset();
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', updateKeyboardInset);
+  window.addEventListener('orientationchange', function () { setTimeout(updateKeyboardInset, 120); });
 
   /* ---------- 屏幕常亮（Wake Lock） ---------- */
   var WAKE_SUPPORTED = ('wakeLock' in navigator);
@@ -120,17 +135,57 @@
   function safeDecode(s) {
     try { return decodeURIComponent(s); } catch (e) { return s; }
   }
-  function urlFor(path) { return path.split('/').map(encodeURIComponent).join('/'); }
+  var currentPath = null;
+
+  /* ---------- 站点根路径与 URL 映射 ---------- */
+  var BASE = (function () {
+    var b = document.documentElement.getAttribute('data-base') || '/';
+    return b.replace(/\/?$/, '/');
+  })();
+  function encodePath(p) { return p.split('/').map(encodeURIComponent).join('/'); }
+  /** 文档路径 -> 可分享的页面 URL（'05-食谱库/花卷.md' -> '/easyvlog/05-食谱库/花卷/'） */
+  function docUrl(path) { return BASE + encodePath(path.replace(/\.md$/, '/')); }
+  /** 文档路径 -> 原始 Markdown 的 URL */
+  function mdUrl(path) { return BASE + encodePath(path); }
+  /** 当前地址栏 -> 文档路径（不是文档页则返回 null） */
+  function docFromLocation() {
+    var p = location.pathname;
+    if (p.indexOf(BASE) !== 0) return null;
+    var rest = p.slice(BASE.length);
+    try { rest = decodeURIComponent(rest); } catch (e) {}
+    rest = rest.replace(/index\.html$/, '').replace(/\/+$/, '');
+    return rest ? rest + '.md' : null;
+  }
   function closeNav() {
     document.body.classList.remove('nav-open');
     if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
     syncScrollLock();
+    restoreFocus();
   }
   function openNav() {
     if (document.body.classList.contains('timer-open')) closeTimerPanel();
+    rememberFocus();
     document.body.classList.add('nav-open');
     if (menuBtn) menuBtn.setAttribute('aria-expanded', 'true');
     syncScrollLock();
+    focusPanel(sidebarEl);
+  }
+
+  /* ---------- 焦点管理（弹层打开时焦点移入，关闭后还原） ---------- */
+  var lastFocus = null;
+  function rememberFocus() { lastFocus = document.activeElement; }
+  function restoreFocus() {
+    var prev = lastFocus;
+    lastFocus = null;
+    if (!prev || typeof prev.focus !== 'function') return;
+    var ae = document.activeElement;
+    var insidePanel = ae && ((sidebarEl && sidebarEl.contains(ae)) || (timerPanel && timerPanel.contains(ae)));
+    if (insidePanel || ae === document.body) {
+      try { prev.focus({ preventScroll: true }); } catch (e) {}
+    }
+  }
+  function focusPanel(el) {
+    if (el && typeof el.focus === 'function') { try { el.focus({ preventScroll: true }); } catch (e) {} }
   }
 
   /* ---------- 滚动锁定（弹层打开时锁住背景） ---------- */
@@ -144,23 +199,42 @@
     document.body.style.right = '0';
     document.body.style.width = '100%';
     scrollLocked = true;
+    // 锁定后页面滚动条消失，此时量到的宽度会变大，要冻结住避免顶栏按钮横移
+    if (window.innerWidth - document.documentElement.clientWidth > 0) {
+      document.body.style.paddingRight = (window.innerWidth - document.documentElement.clientWidth) + 'px';
+    }
   }
   function unlockScroll() {
     if (!scrollLocked) return;
+    var y = scrollLockY;
+    var root = document.documentElement;
+    // 关键：临时关掉全局平滑滚动，否则 scrollTo 会变成动画，
+    // 用户看到的就是“页面刷新后又滚回原位置”。
+    var prevBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.left = '';
     document.body.style.right = '';
     document.body.style.width = '';
+    document.body.style.paddingRight = '';
     scrollLocked = false;
-    window.scrollTo(0, scrollLockY);
+
+    window.scrollTo(0, y);
+    void root.offsetHeight; // 强制同步生效，再恢复平滑滚动
+    root.style.scrollBehavior = prevBehavior;
   }
   function syncScrollLock() {
     var open = document.body.classList.contains('nav-open') || document.body.classList.contains('timer-open');
     open ? lockScroll() : unlockScroll();
   }
   function setActive(path) {
-    allLinks.forEach(function (a) { a.classList.toggle('active', a.dataset.path === path); });
+    allLinks.forEach(function (a) {
+      var on = a.dataset.path === path;
+      a.classList.toggle('active', on);
+      if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
     if (docTitle) docTitle.textContent = titles[path] || '私人食谱库';
     updateTabs(path);
   }
@@ -174,10 +248,14 @@
       b.classList.toggle('active', on);
     });
   }
-  function go(path) {
+  function go(path, opts) {
     if (!path) return;
-    if (decodeHash() === path) navigate(path);
-    else location.hash = '#' + encodeURIComponent(path);
+    try {
+      var url = docUrl(path) + (location.hash && location.hash.length > 1 ? location.hash : '');
+      if (opts && opts.replace) history.replaceState({ doc: path }, '', url);
+      else history.pushState({ doc: path }, '', docUrl(path));
+    } catch (e) { /* file:// 下 history 不可用，降级为直接渲染 */ }
+    navigate(path);
   }
 
   var TOAST_ICONS = { timer: '#ic-timer', printer: '#ic-printer', check: '#ic-check', info: '#ic-info', theme: '#ic-sun-moon', alert: '#ic-info' };
@@ -235,13 +313,21 @@
     return groupState.hasOwnProperty(sec.title) ? !!groupState[sec.title] : defaultOpen(sec);
   }
 
+  /** 目录里的链接：拦截默认跳转，走前端路由（手机上手风更顺） */
+  function navClick(ev, path) {
+    if (ev.defaultPrevented || ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    ev.preventDefault();
+    closeNav();
+    go(path);
+  }
+
   function makeLink(it) {
     var a = document.createElement('a');
-    a.href = '#' + encodeURIComponent(it.path);
+    a.href = docUrl(it.path);
     a.dataset.path = it.path;
     a.dataset.search = (it.title + ' ' + it.path).toLowerCase();
     a.textContent = it.title;
-    a.addEventListener('click', closeNav);
+    a.addEventListener('click', function (ev) { navClick(ev, it.path); });
     allLinks.push(a);
     titles[it.path] = it.title;
     return a;
@@ -256,14 +342,14 @@
     if (SITE.today && SITE.today.path) {
       var pin = document.createElement('a');
       pin.className = 'pin';
-      pin.href = '#' + encodeURIComponent(SITE.today.path);
+      pin.href = docUrl(SITE.today.path);
       pin.dataset.path = SITE.today.path;
       pin.dataset.search = ('今日要做 ' + SITE.today.title + ' ' + SITE.today.path).toLowerCase();
       pin.innerHTML =
         '<span class="pin-label"><svg class="ic" aria-hidden="true"><use href="#ic-utensils"/></svg>今日要做</span>' +
         '<span class="pin-title">' + escapeHtml(SITE.today.title) + '</span>' +
         (SITE.today.note ? '<span class="pin-note">' + escapeHtml(SITE.today.note) + '</span>' : '');
-      pin.addEventListener('click', closeNav);
+      pin.addEventListener('click', function (ev) { navClick(ev, SITE.today.path); });
       nav.appendChild(pin);
       allLinks.push(pin);
       titles[SITE.today.path] = SITE.today.title;
@@ -284,6 +370,8 @@
         '<span class="g-name">' + escapeHtml(sec.title) + '</span>' +
         '<span class="g-count">' + sec.items.length + '</span>' +
         '<svg class="ic g-chev" aria-hidden="true"><use href="#ic-chevron-right"/></svg>';
+      var bodyId = 'grp-' + slug(sec.title);
+      head.setAttribute('aria-controls', bodyId);
       head.addEventListener('click', function () {
         var nowOpen = !group.classList.contains('open');
         group.classList.toggle('open', nowOpen);
@@ -295,6 +383,7 @@
 
       var body = document.createElement('div');
       body.className = 'group-body';
+      body.id = bodyId;
       sec.items.forEach(function (it) { body.appendChild(makeLink(it)); });
       group.appendChild(body);
       nav.appendChild(group);
@@ -326,6 +415,8 @@
       });
       nav.querySelectorAll('a').forEach(function (a) { a.classList.remove('hidden'); });
       if (pinEl) pinEl.style.display = '';
+      var e0 = nav.querySelector('.nav-empty');
+      if (e0) e0.hidden = true;
       return;
     }
     nav.querySelectorAll('.group').forEach(function (g) {
@@ -339,16 +430,62 @@
       g.classList.toggle('open', any);
     });
     if (pinEl) pinEl.style.display = pinEl.dataset.search.indexOf(q) !== -1 ? '' : 'none';
+
+    // 搜不到东西时不要只留一片空白
+    var emptyEl = nav.querySelector('.nav-empty');
+    if (!emptyEl) {
+      emptyEl = document.createElement('p');
+      emptyEl.className = 'nav-empty';
+      emptyEl.textContent = '没有匹配的食谱或脚本';
+      emptyEl.hidden = true;
+      nav.appendChild(emptyEl);
+    }
+    var anyHit = !!nav.querySelector('.group:not(.hidden)') || !!(pinEl && pinEl.style.display !== 'none');
+    emptyEl.hidden = anyHit;
   }
 
   /* ---------- 渲染 ---------- */
-  function render(md, path) {
-    md = stripFrontMatter(md);
-    var html = (window.marked && typeof window.marked.parse === 'function')
-      ? window.marked.parse(md)
-      : '<pre>' + escapeHtml(md) + '</pre>';
-    content.innerHTML = '<article class="md">' + html + '</article>';
+  function scrollInstant(y) {
+    var root = document.documentElement;
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    window.scrollTo(0, y);
+    void root.offsetHeight;
+    root.style.scrollBehavior = prev;
+  }
+  function scrollToHash() {
+    var h = location.hash.replace(/^#/, '');
+    if (!h) return;
+    var id = h;
+    try { id = decodeURIComponent(h); } catch (e) {}
+    var el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: 'start' });
+  }
 
+  /** 接管站内链接：预渲染的静态页和前端渲染的内容走同一条路 */
+  function wireLink(a, path) {
+    if (a.dataset.wired) return;
+    a.dataset.wired = '1';
+    var href = a.getAttribute('href');
+    if (!href || /^(https?:|mailto:|tel:|#)/.test(href)) return;
+    var target = a.dataset.doc || null;
+    if (!target) {
+      if (!/\.md($|[?#])/.test(href)) return;
+      // marked 会把中文链接百分号编码，先解码再解析
+      target = resolve(safeDecode(href.split('#')[0].split('?')[0]), path);
+      if (!titles[target]) return;
+      a.dataset.doc = target;
+      a.setAttribute('href', docUrl(target));
+    }
+    a.addEventListener('click', function (ev) {
+      if (ev.defaultPrevented || ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+      ev.preventDefault();
+      go(target);
+    });
+  }
+
+  /** 内容已就位后的接线（预渲染页与前端渲染共用） */
+  function hydrate(path) {
     content.querySelectorAll('table').forEach(function (t) {
       if (!t.parentElement.classList.contains('table-wrap')) {
         var w = document.createElement('div');
@@ -357,32 +494,33 @@
         w.appendChild(t);
       }
     });
-    content.querySelectorAll('h1,h2,h3').forEach(function (h) { if (!h.id) h.id = slug(h.textContent); });
-
-    content.querySelectorAll('a[href]').forEach(function (a) {
-      var href = a.getAttribute('href');
-      if (!href || /^(https?:|mailto:|tel:)/.test(href)) return;
-      if (href.charAt(0) === '#') return; // 同页锚点，交给浏览器
-      if (!/\.md($|[?#])/.test(href)) return; // 只接管站内 md 链接
-      a.addEventListener('click', function (ev) {
-        ev.preventDefault();
-        // marked 会把中文链接百分号编码，先解码再解析
-        var decoded = safeDecode(href.split('#')[0].split('?')[0]);
-        var target = resolve(decoded, path);
-        if (target) location.hash = '#' + encodeURIComponent(target);
-      });
+    content.querySelectorAll('h1,h2,h3,h4').forEach(function (h) { if (!h.id) h.id = slug(h.textContent); });
+    content.querySelectorAll('img').forEach(function (img) {
+      if (!img.getAttribute('loading')) img.setAttribute('loading', 'lazy');
+      if (!img.getAttribute('decoding')) img.setAttribute('decoding', 'async');
     });
+    content.querySelectorAll('a[href]').forEach(function (a) { wireLink(a, path); });
 
-    if (SITE.today && SITE.today.path === path) {
+    if (!content.querySelector('.today-banner') && SITE.today && SITE.today.path === path) {
       var b = document.createElement('div');
       b.className = 'today-banner';
-      b.textContent = '🔪 今日要做' + (SITE.today.note ? ' · ' + SITE.today.note : '');
+      b.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#ic-utensils"/></svg>' +
+        '<span>今日要做' + (SITE.today.note ? ' · ' + escapeHtml(SITE.today.note) : '') + '</span>';
       content.insertBefore(b, content.firstChild);
     }
 
     decorateSteps(content.querySelector('.md'));
+  }
 
-    window.scrollTo(0, 0);
+  function render(mdText, path) {
+    var body = stripFrontMatter(mdText);
+    var html = (window.marked && typeof window.marked.parse === 'function')
+      ? window.marked.parse(body)
+      : '<pre>' + escapeHtml(body) + '</pre>';
+    content.innerHTML = '<article class="md">' + html + '</article>';
+    hydrate(path);
+    scrollInstant(0);
+    scrollToHash();
     updateProgress();
   }
 
@@ -398,26 +536,54 @@
     return parts.join('/');
   }
 
+  var markedPromise = null;
+  /** 按需加载 Markdown 渲染器：首屏是预渲染好的，根本不需要它 */
+  function loadMarked() {
+    if (window.marked && typeof window.marked.parse === 'function') return Promise.resolve();
+    if (markedPromise) return markedPromise;
+    markedPromise = new Promise(function (resolve, reject) {
+      var s = document.createElement('script');
+      s.src = BASE + 'assets/marked.min.js';
+      s.onload = resolve;
+      s.onerror = function () { reject(new Error('Markdown 渲染器加载失败，检查网络后重试')); };
+      document.head.appendChild(s);
+    });
+    return markedPromise;
+  }
+
+  function skeletonHtml() {
+    return '<div class="skeleton"><div class="sk-line sk-60"></div>' +
+      '<div class="sk-line sk-90"></div><div class="sk-line sk-80"></div></div>';
+  }
+
   function navigate(path) {
+    currentPath = path;
     setActive(path);
     ensureGroupOpen(path);
-    content.innerHTML =
-      '<div class="skeleton"><div class="sk-line sk-60"></div>' +
-      '<div class="sk-line sk-90"></div><div class="sk-line sk-80"></div></div>';
-    fetch(urlFor(path), { cache: 'no-cache' })
+    loadMarked()
+      .then(function () {
+        content.innerHTML = skeletonHtml();
+        return fetch(mdUrl(path), { cache: 'no-cache' });
+      })
       .then(function (r) {
         if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
         return r.text();
       })
       .then(function (md) {
         render(md, path);
-        document.title = (titles[path] ? titles[path] + ' · ' : '') + '毕业生食谱';
+        var t = titles[path];
+        document.title = (t ? t + ' · ' : '') + '毕业生食谱';
+        var d = document.querySelector('meta[name=description]');
+        if (d && t) d.setAttribute('content', t + ' · 毕业生食谱：食材、步骤、避坑与变体。');
         try { localStorage.setItem('lastDoc', path); } catch (e) {}
       })
       .catch(function (err) {
         content.innerHTML =
-          '<div class="md"><h1>打不开这个文档</h1><p><code>' + escapeHtml(path) +
-          '</code></p><p>' + escapeHtml(err.message) + '</p></div>';
+          '<article class="md"><h1>打不开这个文档</h1><p><code>' + escapeHtml(path) +
+          '</code></p><p>' + escapeHtml(err.message) + '</p>' +
+          '<p><button class="retry-btn" type="button">重试</button></p></article>';
+        var btn = content.querySelector('.retry-btn');
+        if (btn) btn.addEventListener('click', function () { navigate(path); });
       });
   }
 
@@ -484,36 +650,59 @@
     });
   }
 
-  /* ---------- 底部抽屉：下拉关闭 ---------- */
+  /* ---------- 底部抽屉：把手可点可拖，下滑关闭 ---------- */
   (function () {
-    var handle = document.querySelector('.sheet-handle');
-    if (!handle || !sidebarEl) return;
-    var sy = 0, dy = 0, drag = false;
-    handle.addEventListener('touchstart', function (e) {
-      if (!document.body.classList.contains('nav-open')) return;
-      drag = true; dy = 0; sy = e.touches[0].clientY;
-      sidebarEl.style.transition = 'none';
-    }, { passive: true });
-    handle.addEventListener('touchmove', function (e) {
-      if (!drag) return;
-      dy = e.touches[0].clientY - sy;
-      if (dy < 0) dy = 0;
-      sidebarEl.style.transform = 'translateY(' + dy + 'px)';
-      if (e.cancelable) e.preventDefault();
-    }, { passive: false });
-    var end = function () {
-      if (!drag) return;
-      drag = false;
-      sidebarEl.style.transition = '';
-      if (dy > 90) closeNav();
-      sidebarEl.style.transform = '';
-    };
-    handle.addEventListener('touchend', end);
-    handle.addEventListener('touchcancel', end);
+    [
+      {
+        handle: document.querySelector('#sidebar .sheet-handle'),
+        panel: sidebarEl,
+        isOpen: function () { return document.body.classList.contains('nav-open'); },
+        close: closeNav
+      },
+      {
+        handle: document.querySelector('#timerPanel .sheet-handle'),
+        panel: document.getElementById('timerPanel'),
+        isOpen: function () { return document.body.classList.contains('timer-open'); },
+        close: closeTimerPanel
+      }
+    ].forEach(function (item) {
+      if (!item.handle || !item.panel) return;
+      var sy = 0, dy = 0, drag = false, moved = false;
+
+      item.handle.addEventListener('touchstart', function (e) {
+        if (!item.isOpen()) return;
+        drag = true; moved = false; dy = 0; sy = e.touches[0].clientY;
+        item.panel.style.transition = 'none';
+      }, { passive: true });
+
+      item.handle.addEventListener('touchmove', function (e) {
+        if (!drag) return;
+        dy = e.touches[0].clientY - sy;
+        if (dy < 0) dy = 0;
+        if (dy > 4) moved = true;
+        item.panel.style.transform = 'translateY(' + dy + 'px)';
+        if (e.cancelable) e.preventDefault();
+      }, { passive: false });
+
+      var end = function () {
+        if (!drag) return;
+        drag = false;
+        item.panel.style.transition = '';
+        if (dy > 90) item.close();
+        item.panel.style.transform = '';
+      };
+      item.handle.addEventListener('touchend', end);
+      item.handle.addEventListener('touchcancel', end);
+
+      /* 轻点把手也能关；刚拖动过就不要重复触发 */
+      item.handle.addEventListener('click', function () {
+        if (moved) { moved = false; return; }
+        if (item.isOpen()) item.close();
+      });
+    });
   })();
 
   backdrop.addEventListener('click', closeNav);
-  if (navClose) navClose.addEventListener('click', closeNav);
 
   /* 桌面：收起 / 展开侧边栏 */
   (function () {
@@ -539,13 +728,10 @@
       navScrollTimer = setTimeout(function () { nav.classList.remove('scrolling'); }, 700);
     }, { passive: true });
   }
+  /* 老式 hash 链接（#05-食谱库/xxx.md）兼容：进来就静默换成新地址 */
   window.addEventListener('hashchange', function () {
     var p = decodeHash();
-    if (p && /\.md$/.test(p)) navigate(p);
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') { closeNav(); }
-    if (e.key === '/' && document.activeElement !== search) { e.preventDefault(); openNav(); search.focus(); }
+    if (p && /\.md$/.test(p) && titles[p]) go(p);
   });
 
   /* ---------- 计时器 ---------- */
@@ -745,15 +931,18 @@
   function openTimerPanel() {
     if (!timerPanel) return;
     if (document.body.classList.contains('nav-open')) closeNav();
+    rememberFocus();
     document.body.classList.add('timer-open');
     timerPanel.setAttribute('aria-hidden', 'false');
     renderTimers();
     syncScrollLock();
+    focusPanel(timerPanel);
   }
   function closeTimerPanel() {
     document.body.classList.remove('timer-open');
     if (timerPanel) timerPanel.setAttribute('aria-hidden', 'true');
     syncScrollLock();
+    restoreFocus();
   }
   function syncWake() {
     if (!WAKE_SUPPORTED) return;
@@ -871,30 +1060,133 @@
   renderTimers();
 
   /* ---------- 启动 ---------- */
+  function homePath() {
+    if (SITE.today && SITE.today.path && titles[SITE.today.path]) return SITE.today.path;
+    var a = allLinks.find(function (l) { return l.dataset.path.indexOf('05-食谱库/00') === 0; });
+    return (a || allLinks[0]).dataset.path;
+  }
+
+  /** 移动端目录是弹层，语义上当 dialog；桌面端是侧栏，保留 landmark */
+  function syncPanelRoles() {
+    if (!sidebarEl) return;
+    var mobile = window.matchMedia && window.matchMedia('(max-width: 959px)').matches;
+    if (mobile) {
+      sidebarEl.setAttribute('role', 'dialog');
+      sidebarEl.setAttribute('aria-modal', 'true');
+    } else {
+      sidebarEl.removeAttribute('role');
+      sidebarEl.removeAttribute('aria-modal');
+    }
+  }
+
   function boot(data) {
     SITE = data;
     buildNav();
-    var lastDoc = null;
-    try { lastDoc = localStorage.getItem('lastDoc'); } catch (e) {}
-    var candidates = [decodeHash(), (SITE.today && SITE.today.path) || null, lastDoc];
-    var start = null;
-    for (var i = 0; i < candidates.length; i++) {
-      if (candidates[i] && allLinks.some(function (a) { return a.dataset.path === candidates[i]; })) {
-        start = candidates[i];
-        break;
+    syncPanelRoles();
+
+    var prerendered = document.body.getAttribute('data-doc') || null;
+    var target = null;
+
+    // 1) 地址栏里的文档页优先
+    var fromUrl = docFromLocation();
+    if (fromUrl && titles[fromUrl]) target = fromUrl;
+
+    // 2) 兼容老的 hash 链接（#05-食谱库/xxx.md），静默换成新地址
+    if (!target) {
+      var h = decodeHash();
+      if (h && titles[h]) {
+        target = h;
+        try { history.replaceState({ doc: h }, '', docUrl(h)); } catch (e) {}
       }
     }
-    if (!start) {
-      var r = allLinks.find(function (a) { return a.dataset.path.indexOf('05-食谱库/00') === 0; });
-      start = r ? r.dataset.path : SITE.sections[0].items[0].path;
+
+    // 3) 回访用户上次看的那篇
+    if (!target) {
+      var lastDoc = null;
+      try { lastDoc = localStorage.getItem('lastDoc'); } catch (e) {}
+      if (lastDoc && titles[lastDoc]) target = lastDoc;
     }
-    navigate(start);
+
+    // 首屏已是构建期渲染好的真 HTML，直接用，不再拉一次
+    if (prerendered && titles[prerendered]) {
+      currentPath = prerendered;
+      setActive(prerendered);
+      ensureGroupOpen(prerendered);
+      hydrate(prerendered);
+      if (target && target !== prerendered) go(target, { replace: true });
+      else scrollToHash();
+      updateProgress();
+      return;
+    }
+
+    navigate(target || homePath());
   }
 
-  fetch('site.json', { cache: 'no-cache' })
-    .then(function (r) { return r.json(); })
-    .then(boot)
-    .catch(function (e) {
-      content.innerHTML = '<div class="md"><h1>无法加载 site.json</h1><p>' + escapeHtml(e.message) + '</p></div>';
+  /* 浏览器前进 / 后退 */
+  window.addEventListener('popstate', function () {
+    if (!SITE) return;
+    var p = docFromLocation();
+    navigate(p && titles[p] ? p : homePath());
+  });
+  window.addEventListener('resize', syncPanelRoles);
+
+  /* ---------- 键盘快捷键 ---------- */
+  function openSearch() {
+    if (window.matchMedia && window.matchMedia('(max-width: 959px)').matches) openNav();
+    if (search) { search.focus(); search.select(); }
+  }
+  function stepDoc(delta) {
+    var list = allLinks.filter(function (a) { return !a.classList.contains('hidden'); });
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].dataset.path === currentPath) {
+        var next = list[i + delta];
+        if (next) go(next.dataset.path);
+        return;
+      }
+    }
+  }
+  document.addEventListener('keydown', function (e) {
+    var t = e.target || {};
+    var typing = /INPUT|TEXTAREA|SELECT/.test(t.tagName || '') || t.isContentEditable;
+
+    if (e.key === 'Escape') {
+      if (document.body.classList.contains('nav-open')) { closeNav(); return; }
+      if (document.body.classList.contains('timer-open')) { closeTimerPanel(); return; }
+      if (search && document.activeElement === search && search.value) {
+        search.value = ''; filterNav('');
+        return;
+      }
+      if (typing && t.blur) t.blur();
+      return;
+    }
+    if (typing) return;
+    if (e.key === '/') { e.preventDefault(); openSearch(); return; }
+    if (e.key === 'j') { e.preventDefault(); stepDoc(1); return; }
+    if (e.key === 'k') { e.preventDefault(); stepDoc(-1); }
+  });
+
+  /* ---------- Service Worker（离线可看） ---------- */
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register(BASE + 'sw.js', { scope: BASE }).catch(function () {});
     });
+  }
+
+  /* ---------- 数据来源：优先用内联的那份，省一次请求 ---------- */
+  (function start() {
+    var el = document.getElementById('site-data');
+    if (el) {
+      try {
+        var data = JSON.parse(el.textContent);
+        if (data && data.sections && data.sections.length) { boot(data); return; }
+      } catch (e) { /* 开发模式下没注入，回落到 fetch */ }
+    }
+    fetch(BASE + 'site.json', { cache: 'no-cache' })
+      .then(function (r) { return r.json(); })
+      .then(boot)
+      .catch(function (e) {
+        content.innerHTML = '<article class="md"><h1>无法加载 site.json</h1><p>' +
+          escapeHtml(e.message) + '</p></article>';
+      });
+  })();
 })();

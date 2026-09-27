@@ -164,12 +164,7 @@ body.nav-open #sidebar { transform: translateX(0); }
 .sidebar-inner { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
 .sidebar-head { display: flex; align-items: center; gap: 8px; padding: 10px; border-bottom: 1px solid var(--line); }
 .sidebar-head .search-wrap { flex: 1; }
-.sheet-close {
-  display: none; width: 40px; height: 40px; flex: none;
-  border: 1px solid var(--line); border-radius: var(--radius-sm);
-  background: var(--surface-2); color: var(--ink); font-size: 16px; cursor: pointer;
-  touch-action: manipulation;
-}
+.sheet-handle:focus-visible { outline-offset: -6px; }
 
 .search-wrap {
   display: flex; align-items: center; gap: 7px;
@@ -325,13 +320,25 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 
 /* 今日要做 提示 */
 .today-banner {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: center; gap: 7px;
   margin: 0 0 16px; padding: 7px 15px;
   border-radius: 999px;
   background: var(--accent-soft); color: var(--accent-ink);
   font-weight: 600; font-size: 14px;
   border: 1px solid var(--accent-line);
 }
+.today-banner .ic { width: 15px; height: 15px; }
+
+/* 目录搜不到东西时的提示 */
+.nav-empty { margin: 20px 12px; color: var(--muted); font-size: 13.5px; text-align: center; }
+
+/* 文档加载失败时的重试按钮 */
+.retry-btn {
+  padding: 8px 18px; border: 1px solid var(--accent-line); border-radius: 10px;
+  background: var(--accent-soft); color: var(--accent-ink);
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.retry-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
 /* 回到顶部 */
 .to-top {
@@ -403,26 +410,47 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 .tab.active { color: var(--accent); }
 .tab-slot { flex: 1; }
 
-/* 底部抽屉把手（移动端） */
+/* 底部抽屉把手（移动端）：看着是一条小横杠，实际是可点 + 可拖的关闭控件 */
 .sheet-handle {
-  display: none; width: 42px; height: 4px; border-radius: 2px;
-  background: var(--line); margin: 8px auto 0; flex: none;
+  display: none; width: 100%; height: 24px; flex: none;
+  align-items: center; justify-content: center;
+  padding: 0; border: 0; background: transparent; cursor: pointer;
+  touch-action: none; -webkit-tap-highlight-color: transparent;
+}
+.sheet-handle span {
+  display: block; width: 42px; height: 4px; border-radius: 2px; background: var(--line);
 }
 
 /* ============ 移动端：底部抽屉 ============ */
 @media (max-width: 959px) {
   .tabbar { display: flex; }
-  .sheet-handle { display: block; }
-  .sheet-close { display: grid; place-items: center; }
+  .sheet-handle { display: flex; }
+
+  /*
+   * iOS Safari 的规矩：输入框字号小于 16px 时，一获得焦点就自动放大整页，
+   * 而且往往不会自动缩回去。把移动端所有输入框抬到 16px，从根上关掉这个行为。
+   * （不要用 maximum-scale=1 去堵，那会连带禁止用户双指缩放，损害可访问性。）
+   */
+  input[type="search"], input[type="text"], input[type="number"],
+  input[type="tel"], input[type="email"], input[type="url"],
+  input[type="password"], textarea {
+    font-size: 16px;
+  }
+  #search::placeholder { font-size: 16px; }
+  /* 字号变大后用内边距把原来的紧凑感拉回来 */
+  #search { padding: 6px 0; }
 
   #sidebar {
-    top: auto; bottom: 0; left: 0; right: 0;
-    width: auto; height: auto; max-height: 82vh;
-    transform: translateY(103%);
+    top: auto; left: 10px; right: 10px;
+    bottom: calc(66px + var(--kb, 0px) + env(safe-area-inset-bottom));
+    width: auto; height: auto;
+    max-height: calc(100vh - 190px - var(--kb, 0px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 190px - var(--kb, 0px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    transform: translateY(calc(100% + 80px));
     opacity: 1; pointer-events: none;
-    border: 0; border-top: 1px solid var(--line);
-    border-radius: 18px 18px 0 0;
-    box-shadow: 0 -10px 44px -22px rgba(0, 0, 0, .5);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 18px 50px -18px rgba(0, 0, 0, .55), 0 -4px 20px -14px rgba(0, 0, 0, .4);
     overflow: hidden;
     z-index: 48;
     transition: transform .2s cubic-bezier(.4,0,.2,1), opacity .2s;
@@ -540,11 +568,15 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
   .timer-fab.has-timers .fab-ico { width: 15px; height: 15px; }
   .timer-fab .fab-time { font-size: 14px; }
   .timer-panel {
-    right: 0; left: 0; bottom: 0; width: auto; max-height: 82vh;
-    border-radius: 18px 18px 0 0; transform: translateY(103%);
+    right: 10px; left: 10px; bottom: calc(66px + var(--kb, 0px) + env(safe-area-inset-bottom)); width: auto;
+    max-height: calc(100dvh - 190px - var(--kb, 0px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    border-radius: 18px; transform: translateY(calc(100% + 80px));
   }
   body.timer-open .timer-panel { transform: translateY(0); }
-  .tp-add { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+  .tp-add { padding-bottom: 12px; }
+  /* 已经有下滑手势和把手了，移动端不再放多余的 ✕ */
+  .tp-close { display: none; }
+  .tp-head { justify-content: center; }
 }
 
 /* ============ 桌面端：左侧栏 ============ */

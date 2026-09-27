@@ -36,3 +36,6 @@ npm-debug.log*
 素材银行/
 素材/
 raw/
+
+# 构建产物（CI 与本地预览生成）
+_site/

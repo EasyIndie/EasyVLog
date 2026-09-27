@@ -32,27 +32,20 @@ jobs:
           node scripts/build-index.mjs
           node scripts/build-site.mjs
 
-      - name: 组装站点产物
+      - name: 静态化并组装站点
+        run: node scripts/build-static.mjs --base /easyvlog/ --out _site
+
+      - name: 压缩 CSS / JS（失败不影响发布）
+        continue-on-error: true
         run: |
-          set -e
-          rm -rf _site
-          mkdir -p _site
-          for f in index.html site.json manifest.webmanifest robots.txt sitemap.xml 404.html; do
-            if [ -f "$f" ]; then cp "$f" _site/; fi
-          done
-          # 注入版本号（提交 SHA）到静态资源 URL，避免缓存旧样式/脚本
-          sed -i "s/__V__/${GITHUB_SHA:0:7}/g" _site/index.html
-          if [ -f .nojekyll ]; then cp .nojekyll _site/; fi
-          cp -R assets _site/
-          if [ -f README.md ]; then cp README.md _site/; fi
-          for d in 01-* 02-* 03-* 04-* 05-*; do
-            if [ -d "$d" ]; then cp -R "$d" _site/; fi
-          done
-          # 模板文件不进站点
-          find _site -name '_模板.md' -delete
-          find _site -name '_template.md' -delete
-          echo "站点文件："
-          find _site -type f | sort
+          min() {
+            npx --yes esbuild@0.24.0 "$1" --minify --outfile="$2" && mv "$2" "$1"
+          }
+          min _site/assets/style.css /tmp/style.min.css || echo "CSS 压缩跳过"
+          min _site/assets/app.js /tmp/app.min.js || echo "JS 压缩跳过"
+          min _site/assets/theme-init.js /tmp/theme.min.js || echo "theme-init 压缩跳过"
+          echo "体积："
+          ls -l _site/assets | awk '{print $5, $9}'
 
       - name: 配置 Pages
         uses: actions/configure-pages@v5

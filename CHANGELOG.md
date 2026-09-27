@@ -6,6 +6,45 @@
 
 ---
 
+## 2026-09-27（移动端交互修正）
+
+- **搜索框聚焦后整页被放大**：iOS Safari 在输入框字号 < 16px 时获得焦点会自动放大整页。移动端把所有输入框抬到 16px（搜索框的紧凑感用内边距拉回来）。**没有**用 `maximum-scale=1`，那会一并禁掉用户的双指缩放，损害可访问性。
+- **软键盘遮住上滑面板**：iOS 弹键盘时只改变 visual viewport，`position: fixed` 的面板会被盖住。新增 `--kb`（由 `visualViewport` 实测）把面板顶上去。
+- **移动端不再放多余的 ✕**：目录/计时面板既然是上滑 + 把手，就把关闭按钮去掉；把手本身变成可点、可拖、可键盘聚焦的控件。
+- **修了个真 bug**：计时器面板的把手原来**根本没绑拖拽**（旧代码只 `querySelector('.sheet-handle')` 拿了第一个，也就是目录那个）。
+
+---
+
+## 2026-09-27（P0～P3 站点工程全部落地）
+
+**P0 架构级**
+- **正文静态化**：新增 `scripts/build-static.mjs`，构建期把每篇 Markdown 渲染成真 HTML（`_site/05-食谱库/xxx/index.html`），路由从 hash 换成真 URL，旧链接自动迁移；`app.js` 改为渐进增强（首屏直接用预渲染内容）。SEO / 首屏 / 分享预览 / 无 JS 可读，一次解决。
+- `site.json` 内联进 HTML，首屏少一次往返。
+- 新增 `sw.js`：外壳预缓存 + 导航网络优先 + 其余 stale-while-revalidate，断网也能翻食谱。
+
+**P1 体验 / 健壮性**
+- **修了一个 bug**：目录/计时器关闭后页面“刷新并滚回原位”——根因是全局 `scroll-behavior: smooth` 让解锁时的 `scrollTo` 变成了动画；现在解锁瞬时归位，并冻结 `--sbw` 防按钮横移。
+- 移动端不再放多余的 ✕：把手本身变成可点、可拖、可键盘聚焦的关闭控件；**计时器面板的把手原来没绑拖拽，一并修好**。
+- 上滑面板抬到标签栏之上，底栏始终可见。
+- ARIA 补齐（`aria-current` / `aria-expanded` / `aria-controls` / `role=dialog` + 焦点移入还原）、搜索无结果提示、加载失败可重试、图片懒加载、`aria-label`。
+- 新增 `assets/theme-init.js` 在 `<head>` 同步执行，深色用户首屏不再闪白。
+- 桌面快捷键：`/` 搜索、`Esc` 关闭、`j`/`k` 上下篇。
+
+**P2 性能**
+- CI 用 esbuild 压缩 CSS/JS（失败不阻塞发布）。
+- `marked.min.js` 从阻塞脚本改为**切页时才按需加载**（首屏不再需要）。
+- `app.js` 加 `defer`。
+
+**P3 长期**
+- 食谱页输出 `Recipe` JSON-LD（配料/步骤/耗时/份量），其余页输出 `WebPage`。
+- `sitemap.xml` 构建期生成，覆盖全部文档。
+- 新增 `LICENSE`（内容 CC BY-NC-SA 4.0 / 代码 MIT）。
+- 加 CSP meta（无内联脚本、无外部依赖）。
+- `build-static.mjs` 加构建断言，front matter/路径/重复项不对就直接让 CI 失败。
+- 构建脚本新增 `scripts/build-static.mjs` / `scripts/make-icons.py` / `scripts/preview.sh`。
+
+---
+
 ## 2026-09-27（图标 / SEO / PWA / 可访问性）
 
 - **图标体系**：新增 `favicon.svg` + `favicon.ico`(16/32/48/64) + `apple-touch-icon.png` + PWA `icon-192/512` + 分享图 `og.png`(1200×630)；生成脚本 `scripts/make-icons.py`。
