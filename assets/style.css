@@ -419,7 +419,7 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
   #backdrop { inset: 0; z-index: 30; }
 
   #content { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
-  .to-top { bottom: calc(70px + env(safe-area-inset-bottom)); right: 14px; }
+  .to-top { bottom: calc(118px + env(safe-area-inset-bottom)); right: 14px; }
 }
 
 /* ============ 计时器 ============ */
