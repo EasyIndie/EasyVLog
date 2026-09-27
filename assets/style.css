@@ -487,17 +487,16 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
 @media (max-width: 959px) {
   .timer-fab {
     left: 50%; right: auto; margin-left: -31px;
-    bottom: calc(28px + env(safe-area-inset-bottom));
+    bottom: calc(9px + env(safe-area-inset-bottom));
     width: 62px; height: 62px; padding: 0; gap: 0;
     flex-direction: column;
-    border: 4px solid var(--bg);
+    border: 0;
     background: var(--accent); color: #fff;
-    box-shadow: 0 10px 26px -10px rgba(0, 0, 0, .55);
+    box-shadow: 0 -2px 8px -4px rgba(0, 0, 0, .3), 0 8px 20px -12px rgba(0, 0, 0, .5);
   }
-  .timer-fab .fab-ico { font-size: 20px; }
-  .timer-fab.has-timers .fab-ico { font-size: 13px; }
-  .timer-fab .fab-time { font-size: 13px; }
-  .timer-fab.done { border-color: var(--bg); }
+  .timer-fab .fab-ico { font-size: 26px; line-height: 1; }
+  .timer-fab.has-timers .fab-ico { font-size: 14px; }
+  .timer-fab .fab-time { font-size: 14px; }
   .timer-panel {
     right: 0; left: 0; bottom: 0; width: auto; max-height: 82vh;
     border-radius: 18px 18px 0 0; transform: translateY(103%);
