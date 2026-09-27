@@ -41,6 +41,16 @@
   });
   initTheme();
 
+  /* ---------- 滚动条占位宽度（Safari/Chrome 经典滚动条会挤占右侧） ---------- */
+  function updateSbw() {
+    var w = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+    document.documentElement.style.setProperty('--sbw', w + 'px');
+  }
+  updateSbw();
+  window.addEventListener('resize', updateSbw);
+  window.addEventListener('orientationchange', function () { setTimeout(updateSbw, 120); });
+  if (window.ResizeObserver) new ResizeObserver(updateSbw).observe(document.documentElement);
+
   /* ---------- 屏幕常亮（Wake Lock） ---------- */
   var WAKE_SUPPORTED = ('wakeLock' in navigator);
   var wakeLock = null;
