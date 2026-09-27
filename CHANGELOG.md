@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-09-27（图标 / SEO / PWA / 可访问性）
+
+- **图标体系**：新增 `favicon.svg` + `favicon.ico`(16/32/48/64) + `apple-touch-icon.png` + PWA `icon-192/512` + 分享图 `og.png`(1200×630)；生成脚本 `scripts/make-icons.py`。
+- **分享与 SEO**：补齐 `og:*` / `twitter:*` 卡片、`canonical`、`robots.txt`、`sitemap.xml`、`404.html`、`format-detection`。
+- **PWA**：新增 `manifest.webmanifest`，可「添加到主屏幕」。
+- **a11y**：`:focus-visible` 焦点样式、`prefers-reduced-motion`、`::selection`；亮色 `--muted` 对比度 4.19→5.3:1（过 AA）。
+- **兼容**：重置 Safari 的 `search` / `number` 输入框默认外观；`scroll-padding-top` 防锚点被顶栏遮。
+- **无脚本兑底**：`<noscript>` 提示 + 仓库原文链接，不再白屏。
+- **审计**：新增 `站点审计.md`，列出 P0～P3 待办（最大一项：正文静态化以解决 SEO）。
+
+---
+
 ## 2026-09-27（移动端目录改底部上滑面板）
 
 - 移动端目录从「居中浮层」改为**底部上滑面板**，与计时器完全一致：满宽、顶部圆角 18px、`82vh` 上限、`translateY(103%) → 0` 滑入。

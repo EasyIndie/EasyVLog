@@ -10,7 +10,7 @@
   --surface-2: #faf9f6;
   --ink: #201e1b;
   --ink-2: #4a453e;
-  --muted: #7b756b;
+  --muted: #6b655c;
   --line: #e7e3db;
   --code-bg: #efece6;
 
@@ -55,7 +55,7 @@
 .ic-sm { width: 16px; height: 16px; }
 .ic-tab { width: 22px; height: 22px; }
 .only-desktop { display: none !important; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; touch-action: manipulation; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; touch-action: manipulation; scroll-padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 14px); }
 
 /* 防止移动端双击误触发缩放*/
 
@@ -582,6 +582,40 @@ body.nav-open, body.timer-open { overflow: hidden; }
 #nav::-webkit-scrollbar-thumb:hover, .tp-list::-webkit-scrollbar-thumb:hover,
 .table-wrap::-webkit-scrollbar-thumb:hover,
 .md pre::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+
+/* ============ 可访问性 / 浏览器细节 ============ */
+
+/* 键盘焦点：只在键盘操作时显示，鼠标点击不闪框 */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:focus:not(:focus-visible) { outline: none; }
+
+::selection { background: var(--accent-soft); color: var(--accent-ink); }
+
+/* Safari / iOS 对 search 输入框有默认外观，清掉才能和设计一致 */
+input[type="search"], input[type="number"] { -webkit-appearance: none; appearance: none; }
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration { -webkit-appearance: none; display: none; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* 禁用脚本时的兑底内容 */
+.noscript { padding: 28px 20px; max-width: var(--maxw); margin: 0 auto; }
+.noscript h1 { font-size: 26px; margin: 0 0 12px; line-height: 1.3; }
+.noscript p { color: var(--ink-2); margin: 0 0 10px; }
+.noscript ul { color: var(--ink-2); padding-left: 20px; }
+
+/* 尊重系统「减少动画」偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 /* ============ 打印 ============ */
 @media print {

@@ -60,6 +60,9 @@
 | `data/today.json` | 站点「今日要做」指向 | 手写/脚本 |
 | `index.html` + `assets/` | 在线站（GitHub Pages，手机可看） | 手写 |
 | `site.json` | 在线站导航清单 | **自动生成，禁止手改** |
+| `manifest.webmanifest` + `robots.txt` + `sitemap.xml` + `404.html` | 在线站 PWA / SEO / 错误页 | 手写 |
+| `assets/favicon.*` `assets/icon-*.png` `assets/og.png` | 站点图标与分享图（用 `scripts/make-icons.py` 生成） | 生成物（已提交） |
+| `站点审计.md` | 站点工程侧待办与优化清单 | 手写 |
 | `.github/workflows/deploy-pages.yml` | 推 main 自动重建并部署 Pages | 手写 |
 | `scripts/` | 生成索引、脚手架、站点、查看工具 | 代码 |
 | `.pi/prompts/` | 斜杠命令（`/new-episode` 等） | 手写 |
