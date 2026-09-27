@@ -13,7 +13,6 @@
   <a class="skip" href="#content">跳到正文</a>
 
   <header class="topbar">
-    <button id="menuBtn" class="icon-btn only-mobile" aria-label="打开目录" aria-expanded="false">☰</button>
     <div class="brand">
       <span class="brand-mark" aria-hidden="true">食</span>
       <span class="brand-text">
@@ -32,6 +31,7 @@
   <div class="layout">
     <aside id="sidebar" aria-label="目录">
       <div class="sidebar-inner">
+        <div class="sheet-handle" aria-hidden="true"></div>
         <div class="sidebar-head">
           <label class="search-wrap">
             <span aria-hidden="true">⌕</span>
@@ -58,6 +58,21 @@
       </div>
     </main>
   </div>
+
+  <nav class="tabbar" aria-label="主导航">
+    <button class="tab" type="button" data-action="nav">
+      <span class="tab-ico" aria-hidden="true">🗂</span><span class="tab-txt">目录</span>
+    </button>
+    <button class="tab" type="button" data-action="today">
+      <span class="tab-ico" aria-hidden="true">🔪</span><span class="tab-txt">今日</span>
+    </button>
+    <button class="tab" type="button" data-action="recipes">
+      <span class="tab-ico" aria-hidden="true">📖</span><span class="tab-txt">食谱</span>
+    </button>
+    <button class="tab" type="button" data-action="scripts">
+      <span class="tab-ico" aria-hidden="true">📝</span><span class="tab-txt">脚本</span>
+    </button>
+  </nav>
 
   <button id="toTop" class="to-top" aria-label="回到顶部" title="回到顶部">↑</button>
 

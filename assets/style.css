@@ -344,12 +344,58 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 }
 .toast .t-close:hover { background: var(--surface-2); color: var(--ink); }
 
-.only-mobile { display: grid; }
-@media (min-width: 960px) { .only-mobile { display: none; } }
+/* ============ 底部标签栏（仅移动端） ============ */
+.tabbar {
+  display: none;
+  position: fixed; left: 0; right: 0; bottom: 0;
+  height: calc(58px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: saturate(1.6) blur(12px);
+  -webkit-backdrop-filter: saturate(1.6) blur(12px);
+  border-top: 1px solid var(--line);
+  z-index: 45;
+}
+.tab {
+  flex: 1; border: 0; background: transparent; color: var(--muted);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font: inherit; font-size: 10.5px; letter-spacing: .02em; cursor: pointer;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.tab .tab-ico { font-size: 19px; line-height: 1; }
+.tab.active { color: var(--accent); }
 
-/* ============ 桌面端 ============ */
+/* 底部抽屉把手（移动端） */
+.sheet-handle {
+  display: none; width: 42px; height: 4px; border-radius: 2px;
+  background: var(--line); margin: 8px auto 0; flex: none;
+}
+
+/* ============ 移动端：底部抽屉 ============ */
+@media (max-width: 959px) {
+  .tabbar { display: flex; }
+  .sheet-handle { display: block; }
+
+  #sidebar {
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: auto; max-height: 84vh;
+    border-right: 0; border-top: 1px solid var(--line);
+    border-radius: 18px 18px 0 0;
+    transform: translateY(103%);
+    box-shadow: 0 -16px 48px -16px rgba(0, 0, 0, .5);
+    overflow: hidden;
+    z-index: 50;
+  }
+  body.nav-open #sidebar { transform: translateY(0); }
+  #backdrop { inset: 0; z-index: 30; }
+
+  #content { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
+  .to-top { bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
+}
+
+/* ============ 桌面端：左侧栏 ============ */
 @media (min-width: 960px) {
-  #menuBtn { display: none; }
   #sidebar { transform: none; width: var(--sidebar-w); }
   #backdrop { display: none; }
   #content { margin-left: var(--sidebar-w); padding: 34px 44px 160px; }

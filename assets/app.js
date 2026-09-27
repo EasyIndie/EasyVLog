@@ -5,6 +5,8 @@
   var content = document.getElementById('content');
   var search = document.getElementById('search');
   var menuBtn = document.getElementById('menuBtn');
+  var sidebarEl = document.getElementById('sidebar');
+  var tabbar = document.querySelector('.tabbar');
   var printBtn = document.getElementById('printBtn');
   var themeBtn = document.getElementById('themeBtn');
   var backdrop = document.getElementById('backdrop');
@@ -109,15 +111,31 @@
   function urlFor(path) { return path.split('/').map(encodeURIComponent).join('/'); }
   function closeNav() {
     document.body.classList.remove('nav-open');
-    menuBtn.setAttribute('aria-expanded', 'false');
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
   }
   function openNav() {
     document.body.classList.add('nav-open');
-    menuBtn.setAttribute('aria-expanded', 'true');
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', 'true');
   }
   function setActive(path) {
     allLinks.forEach(function (a) { a.classList.toggle('active', a.dataset.path === path); });
     if (docTitle) docTitle.textContent = titles[path] || '私人食谱库';
+    updateTabs(path);
+  }
+  function updateTabs(path) {
+    if (!tabbar) return;
+    tabbar.querySelectorAll('.tab').forEach(function (b) {
+      var a = b.dataset.action, on = false;
+      if (a === 'today') on = !!(SITE && SITE.today && path === SITE.today.path);
+      else if (a === 'recipes') on = path.indexOf('05-食谱库/') === 0;
+      else if (a === 'scripts') on = path.indexOf('02-分集脚本/') === 0;
+      b.classList.toggle('active', on);
+    });
+  }
+  function go(path) {
+    if (!path) return;
+    if (decodeHash() === path) navigate(path);
+    else location.hash = '#' + encodeURIComponent(path);
   }
 
   var toastEl = null, toastTimer = null;
@@ -400,10 +418,52 @@
     }, isiOS() ? 400 : 60);
   });
 
-  /* ---------- 事件 ---------- */
-  menuBtn.addEventListener('click', function () {
-    document.body.classList.contains('nav-open') ? closeNav() : openNav();
-  });
+  /* ---------- 底部标签栏 ---------- */
+  function firstPath(prefix) {
+    var a = allLinks.find(function (l) { return l.dataset.path.indexOf(prefix) === 0; });
+    return a ? a.dataset.path : null;
+  }
+  if (tabbar) {
+    tabbar.addEventListener('click', function (e) {
+      var btn = e.target && e.target.closest ? e.target.closest('.tab') : null;
+      if (!btn) return;
+      var action = btn.dataset.action;
+      if (action === 'nav') { openNav(); return; }
+      closeNav();
+      if (action === 'today') go(SITE && SITE.today && SITE.today.path);
+      else if (action === 'recipes') go(firstPath('05-食谱库/00'));
+      else if (action === 'scripts') go(firstPath('02-分集脚本/00'));
+    });
+  }
+
+  /* ---------- 底部抽屉：下拉关闭 ---------- */
+  (function () {
+    var handle = document.querySelector('.sheet-handle');
+    if (!handle || !sidebarEl) return;
+    var sy = 0, dy = 0, drag = false;
+    handle.addEventListener('touchstart', function (e) {
+      if (!document.body.classList.contains('nav-open')) return;
+      drag = true; dy = 0; sy = e.touches[0].clientY;
+      sidebarEl.style.transition = 'none';
+    }, { passive: true });
+    handle.addEventListener('touchmove', function (e) {
+      if (!drag) return;
+      dy = e.touches[0].clientY - sy;
+      if (dy < 0) dy = 0;
+      sidebarEl.style.transform = 'translateY(' + dy + 'px)';
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+    var end = function () {
+      if (!drag) return;
+      drag = false;
+      sidebarEl.style.transition = '';
+      if (dy > 90) closeNav();
+      sidebarEl.style.transform = '';
+    };
+    handle.addEventListener('touchend', end);
+    handle.addEventListener('touchcancel', end);
+  })();
+
   backdrop.addEventListener('click', closeNav);
   window.addEventListener('hashchange', function () {
     var p = decodeHash();
