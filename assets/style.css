@@ -417,7 +417,9 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 
   #sidebar {
     top: 50%; bottom: auto; left: 10px; right: 10px;
-    width: auto; height: auto; max-height: 74vh;
+    width: auto; height: auto;
+    max-height: calc(100vh - 136px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 136px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     transform: translateY(-50%);
     translate: 0 16px;
     opacity: 0; pointer-events: none;
@@ -426,7 +428,8 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
     overflow: hidden;
     z-index: 50;
   }
-  body.nav-open #sidebar { translate: 0 0; opacity: 1; pointer-events: auto; }
+  /* 权重需与基础规则 body.nav-open #sidebar 一致，否则 transform 被覆盖 */
+  body.nav-open #sidebar { transform: translateY(-50%); translate: 0 0; opacity: 1; pointer-events: auto; }
   #backdrop { inset: 0; z-index: 30; }
 
   #content { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
