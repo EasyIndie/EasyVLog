@@ -16,11 +16,21 @@
 - **对内**：把每次做的东西攒成可复用的食谱（私人收藏）。
 - **对外**：把过程剪成 60 秒短视频发出去（小红书为主）。
 
-本仓库是它的完整资料库，按四块组织：
+本仓库分两块：
+
+### 🟢 核心：私人食谱库
+
+| 目录 | 作用 |
+|---|---|
+| `05-食谱库/` | 按菜名归档的可复用食谱卡（食材/步骤/避坑/变体），**账号的核心** |
+
+### ⚪ 可选：对外运营
+
+> 只在「想把食谱做成对外短视频」时才需要。
 
 | 目录 | 作用 | 什么时候看 |
 |---|---|---|
-| `01-账号规划/` | 账号战略、定位、平台、栏目、SOP、数据、计划 | 开号前通读一遍，之后定期回看 |
+| `01-账号规划/` | 账号战略、定位、平台、栏目、SOP、数据、计划 | 开号前通读 |
 | `02-分集脚本/` | 每一集的逐秒分镜、配方、封面、标题 | 拍之前照着拍 |
 | `03-拍摄手册/` | 批量拍摄流程、器材清单、素材银行 | 拍摄当天用 |
 | `04-运营记录/` | 发布记录、数据复盘 | 发布后填写 |
@@ -35,7 +45,8 @@ EasyVLog/
 ├── AGENTS.md                     ← AI 工具入口（规则/护栏/工作流）
 ├── CHANGELOG.md                  ← 重要变更记录
 │
-├── 01-账号规划/
+├── 01-账号规划/                  ← 对外运营（可选）
+│   ├── 00-说明-可选.md
 │   ├── 01-定位与调性.md
 │   ├── 02-平台与内容矩阵.md
 │   ├── 03-栏目与选题库.md
@@ -46,19 +57,26 @@ EasyVLog/
 │   ├── 08-合规与风险.md
 │   └── 09-账号名排查记录.md
 │
-├── 02-分集脚本/
+├── 02-分集脚本/                  ← 对外运营（可选）
 │   ├── 00-分集索引.md            ← 自动生成，勿手改
 │   ├── _template.md              ← 新分集模板
 │   ├── 第01集-韭菜鸡蛋包.md
 │   ├── 第02集-花卷.md
 │   └── ...
 │
-├── 03-拍摄手册/
+├── 03-拍摄手册/                  ← 对外运营（可选）
 │   ├── 周末批量拍摄.md
 │   └── 素材银行清单.md
 │
 ├── 04-运营记录/
-│   └── 发布与复盘表.md
+│   └── 发布与复盘表.md            ← 对外运营（可选）
+│
+├── 05-食谱库/                    ← 🟢 核心：私人食谱库
+│   ├── 00-食谱索引.md            ← 自动生成，勿手改
+│   ├── _模板.md
+│   ├── 韭菜鸡蛋包.md
+│   ├── 花卷.md
+│   └── ...
 │
 ├── data/
 │   └── backlog.json              ← 选题池（未建脚本的剧集）
@@ -66,17 +84,27 @@ EasyVLog/
 ├── scripts/
 │   ├── build-index.mjs           ← 重建分集索引
 │   ├── new-episode.mjs           ← 新建一集
+│   ├── build-recipes.mjs         ← 重建食谱索引
+│   ├── new-recipe.mjs            ← 新建食谱卡
+│   ├── lib/frontmatter.mjs       ← front matter 解析
 │   └── look.sh                   ← glow 浏览文档
 │
 └── .pi/
-    ├── prompts/                  ← /new-episode、/review-episode、/weekly-review
-    └── skills/episode-writer/    ← 分集写作技能
+    ├── prompts/                  ← /new-episode、/new-recipe、/review-episode、/weekly-review
+    └── skills/
+        ├── episode-writer/       ← 分集写作技能
+        └── recipe-writer/        ← 食谱写作技能
 ```
 
 ---
 
 ## 快速开始
 
+**只想攒食谱（核心）**：
+1. 新建：`node scripts/new-recipe.mjs "韭菜鸡蛋包" --category "包子"`
+2. 填写食材、步骤、避坑，保存后索引自动更新。
+
+**想对外发布（可选）**：
 1. **第一次**：读 `01-账号规划/` 全部，建立整体认知。
 2. **开号前**：确认 `01-定位与调性.md` 里的账号名、简介、头像方向。
 3. **开拍前**：打开 `02-分集脚本/第01集-韭菜鸡蛋包.md` + `03-拍摄手册/周末批量拍摄.md`。
@@ -93,12 +121,18 @@ EasyVLog/
 - **命令**：
 
 ```bash
-node scripts/new-episode.mjs "标题" --series "翻车日记"   # 新建一集
-node scripts/build-index.mjs                                # 重建索引
-./scripts/look.sh                                           # 浏览文档
+# 🟢 核心：食谱库
+node scripts/new-recipe.mjs "韭菜鸡蛋包" --category "包子"   # 新建食谱卡
+node scripts/build-recipes.mjs                                # 重建食谱索引
+
+# ⚪ 可选：对外运营
+node scripts/new-episode.mjs "标题" --series "翻车日记"        # 新建一集
+node scripts/build-index.mjs                                  # 重建分集索引
+
+./scripts/look.sh                                             # 浏览文档
 ```
 
-- **pi 斜杠命令**：`/new-episode`、`/review-episode`、`/weekly-review`
+- **pi 斜杠命令**：`/new-recipe`、`/new-episode`、`/review-episode`、`/weekly-review`
 
 详见 `AGENTS.md`。
 
