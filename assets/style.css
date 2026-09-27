@@ -62,7 +62,7 @@
   --scrollbar-hover: #48525c;
   --line-strong: #464f58;
   --zebra: #1e2328;
-  --pre-bg: #12161a;        /* 比 --surface 更深，代码块在深色下才有边界 */
+  --pre-bg: #262c31;        /* 要比 --bg(#14171a) 亮一档——深色下代码块是“凸起的面”，不是“凹槽” */
   --pre-ink: #e8ecef;
   color-scheme: dark;
 }
@@ -518,7 +518,12 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
    * 列数多的表（分集脚本 7 列）本来就要横滑，不受影响。
    */
   .md th, .md td { padding: 8px 10px; }
-  .md td:last-child, .md th:last-child { white-space: normal; }
+  /*
+   * 不要单独放末列换行。其他列都是 nowrap（宽度锁死），只留最后一列可换，
+   * 浏览器就会把它压到最小宽度；中文能在任意字之间断行，最小宽度就是「一个字」，
+   * 于是「打开」变竖排、长文本被挤成又窄又高的一列（实测行高能到 1000px+）。
+   * 宁可让容器横滑（右缘有渐隐提示），也不要这种窃法。
+   */
 
   /*
    * 食材表在窄屏改成「一行一块」：材料 + 用量同一行，备注换到下一行的小字。
