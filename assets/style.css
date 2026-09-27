@@ -47,7 +47,7 @@
 .ic { width: 20px; height: 20px; display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .ic-sm { width: 16px; height: 16px; }
 .ic-tab { width: 22px; height: 22px; }
-.only-desktop { display: none; }
+.only-desktop { display: none !important; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; touch-action: manipulation; }
 
 /* 防止移动端双击误触发缩放*/
@@ -411,8 +411,8 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
   .sheet-close { display: grid; place-items: center; }
 
   #sidebar {
-    top: 50%; left: 10px; right: 10px;
-    width: auto; height: fit-content; max-height: 74vh;
+    top: 50%; bottom: auto; left: 10px; right: 10px;
+    width: auto; height: auto; max-height: 74vh;
     transform: translateY(-50%);
     translate: 0 16px;
     opacity: 0; pointer-events: none;
@@ -540,7 +540,7 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
 
 /* ============ 桌面端：左侧栏 ============ */
 @media (min-width: 960px) {
-  .only-desktop { display: grid; }
+  .only-desktop { display: grid !important; }
   #sidebar { transform: none; width: var(--sidebar-w); }
   body.sidebar-collapsed #sidebar { transform: translateX(-104%); }
   #backdrop { display: none; }
