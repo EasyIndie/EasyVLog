@@ -622,12 +622,24 @@
   }
   function updateFab() {
     if (!timerFab) return;
-    var active = timers.filter(function (t) { return !t.done; });
-    if (active.length) {
+    var running = timers.filter(function (t) { return !t.done && t.endAt; });
+    var paused = timers.filter(function (t) { return !t.done && !t.endAt; });
+    var done = timers.filter(function (t) { return t.done; });
+    if (running.length) {
       timerFab.classList.add('has-timers');
-      timerFabTime.textContent = fmtClock(Math.min.apply(null, active.map(remainOf)));
+      timerFab.classList.remove('done');
+      timerFabTime.textContent = fmtClock(Math.min.apply(null, running.map(remainOf)));
+    } else if (paused.length) {
+      timerFab.classList.add('has-timers');
+      timerFab.classList.remove('done');
+      timerFabTime.textContent = fmtClock(Math.min.apply(null, paused.map(remainOf)));
+    } else if (done.length) {
+      timerFab.classList.remove('has-timers');
+      timerFab.classList.add('done');
+      timerFabTime.textContent = '完成';
     } else {
       timerFab.classList.remove('has-timers');
+      timerFab.classList.remove('done');
       timerFabTime.textContent = '';
     }
   }
