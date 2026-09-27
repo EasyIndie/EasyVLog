@@ -38,22 +38,20 @@
   initTheme();
 
   /* ---------- 屏幕常亮（Wake Lock） ---------- */
+  var WAKE_SUPPORTED = ('wakeLock' in navigator);
   var wakeLock = null;
   var wakeWanted = false;
 
   function updateWakeBtn() {
     if (!wakeBtn) return;
-    var supported = 'wakeLock' in navigator;
-    wakeBtn.disabled = !supported;
+    if (!WAKE_SUPPORTED) { wakeBtn.hidden = true; return; } // 不支持则隐藏，不占位
+    wakeBtn.hidden = false;
     wakeBtn.classList.toggle('on', !!wakeLock);
     wakeBtn.setAttribute('aria-pressed', wakeLock ? 'true' : 'false');
-    wakeBtn.title = !supported ? '当前浏览器不支持屏幕常亮' : (wakeLock ? '屏幕常亮：已开' : '屏幕常亮：已关');
+    wakeBtn.title = wakeLock ? '屏幕常亮：已开' : '屏幕常亮：已关';
   }
   function acquireWake(report) {
-    if (!('wakeLock' in navigator)) {
-      if (report) showToast({ icon: '💡', title: '不支持屏幕常亮', text: '请用较新的 Safari 或 Chrome 打开' });
-      return;
-    }
+    if (!WAKE_SUPPORTED) return;
     navigator.wakeLock.request('screen').then(function (lock) {
       wakeLock = lock;
       lock.addEventListener('release', function () { wakeLock = null; updateWakeBtn(); });
@@ -75,10 +73,7 @@
     updateWakeBtn();
 
     wakeBtn.addEventListener('click', function () {
-      if (!('wakeLock' in navigator)) {
-        showToast({ icon: '💡', title: '不支持屏幕常亮', text: '请用较新的 Safari 或 Chrome 打开' });
-        return;
-      }
+      if (!WAKE_SUPPORTED) return;
       wakeWanted = !wakeWanted;
       try { localStorage.setItem('wake', wakeWanted ? '1' : '0'); } catch (e) {}
       if (wakeWanted) acquireWake(true);
