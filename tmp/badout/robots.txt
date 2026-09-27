@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# 模板文件没有阅读价值
+Disallow: /easyvlog/05-%E9%A3%9F%E8%B0%B1%E5%BA%93/_%E6%A8%A1%E6%9D%BF.md
+
+Sitemap: https://easyindie.github.io/easyvlog/sitemap.xml

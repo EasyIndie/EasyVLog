@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-base="__BASE__">
+<html lang="zh-CN" data-base="/">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,17 +11,17 @@
   <!-- 安全策略：无内联脚本、无外部依赖、无 frame 嵌套 -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; form-action 'none'">
 
-  <title>__TITLE__</title>
-  <meta name="description" content="__DESC__">
+  <title>平台与内容矩阵</title>
+  <meta name="description" content="平台 角色 版本 时长 核心指标 备注 --- --- --- --- --- --- 小红书 主战场 完整版 + 图文配方 60–90s + 图文 收藏率、赞藏比 面食收藏率极高，涨粉与商单最实际 抖音 引流/放量">
   <meta name="author" content="毕业生食谱">
-  <link rel="canonical" href="__CANONICAL__">
+  <link rel="canonical" href="https://easyindie.github.io/01-%E8%B4%A6%E5%8F%B7%E8%A7%84%E5%88%92/02-%E5%B9%B3%E5%8F%B0%E4%B8%8E%E5%86%85%E5%AE%B9%E7%9F%A9%E9%98%B5/">
   <meta name="robots" content="index,follow,max-image-preview:large">
 
   <!-- 图标 / PWA -->
-  <link rel="icon" href="__BASE__assets/favicon.ico" sizes="32x32">
-  <link rel="icon" href="__BASE__assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="__BASE__assets/apple-touch-icon.png">
-  <link rel="manifest" href="__BASE__manifest.webmanifest">
+  <link rel="icon" href="/assets/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
   <meta name="application-name" content="毕业生食谱">
   <meta name="apple-mobile-web-app-title" content="毕业生食谱">
   <meta name="mobile-web-app-capable" content="yes">
@@ -32,30 +32,43 @@
   <!-- 社交分享 -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="毕业生食谱">
-  <meta property="og:title" content="__TITLE__">
-  <meta property="og:description" content="__DESC__">
-  <meta property="og:url" content="__OG_URL__">
+  <meta property="og:title" content="平台与内容矩阵">
+  <meta property="og:description" content="平台 角色 版本 时长 核心指标 备注 --- --- --- --- --- --- 小红书 主战场 完整版 + 图文配方 60–90s + 图文 收藏率、赞藏比 面食收藏率极高，涨粉与商单最实际 抖音 引流/放量">
+  <meta property="og:url" content="https://easyindie.github.io/01-%E8%B4%A6%E5%8F%B7%E8%A7%84%E5%88%92/02-%E5%B9%B3%E5%8F%B0%E4%B8%8E%E5%86%85%E5%AE%B9%E7%9F%A9%E9%98%B5/">
   <meta property="og:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="毕业生食谱 · 认真做饭，认真生活">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="__TITLE__">
-  <meta name="twitter:description" content="__DESC__">
+  <meta name="twitter:title" content="平台与内容矩阵">
+  <meta name="twitter:description" content="平台 角色 版本 时长 核心指标 备注 --- --- --- --- --- --- 小红书 主战场 完整版 + 图文配方 60–90s + 图文 收藏率、赞藏比 面食收藏率极高，涨粉与商单最实际 抖音 引流/放量">
   <meta name="twitter:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
 
   <!-- 结构化数据：食谱页输出 Recipe，其余输出 WebPage -->
-  <script type="application/ld+json">__JSONLD__</script>
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "平台与内容矩阵",
+  "url": "https://easyindie.github.io/01-%E8%B4%A6%E5%8F%B7%E8%A7%84%E5%88%92/02-%E5%B9%B3%E5%8F%B0%E4%B8%8E%E5%86%85%E5%AE%B9%E7%9F%A9%E9%98%B5/",
+  "inLanguage": "zh-CN",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "毕业生食谱",
+    "url": "https://easyindie.github.io/"
+  }
+}</script>
 
   <!-- 导航清单内联，省掉首屏一次请求 -->
-  <script id="site-data" type="application/json">__SITE_JSON__</script>
+  <script id="site-data" type="application/json">{"generated":"2026-09-27","title":"毕业生食谱","sections":[{"title":"总览","icon":"info","items":[{"title":"项目总览","path":"README.md"}]},{"title":"食谱库","icon":"book-open","highlight":true,"items":[{"title":"食谱索引","path":"05-食谱库/00-食谱索引.md"},{"title":"花卷","path":"05-食谱库/花卷.md"},{"title":"韭菜鸡蛋胡萝卜包","path":"05-食谱库/韭菜鸡蛋胡萝卜包.md"}]},{"title":"分集脚本","icon":"clapperboard","items":[{"title":"分集索引","path":"02-分集脚本/00-分集索引.md"},{"title":"韭菜鸡蛋胡萝卜包（没有粉丝版）","path":"02-分集脚本/第01集-韭菜鸡蛋胡萝卜包.md"},{"title":"花卷","path":"02-分集脚本/第02集-花卷.md"}]},{"title":"拍摄手册","icon":"video","items":[{"title":"素材银行清单","path":"03-拍摄手册/素材银行清单.md"},{"title":"周末批量拍摄手册","path":"03-拍摄手册/周末批量拍摄.md"}]},{"title":"账号规划","icon":"clipboard-list","items":[{"title":"定位与调性","path":"01-账号规划/01-定位与调性.md"},{"title":"对外运营方案说明（可选）","path":"01-账号规划/00-说明-可选.md"},{"title":"平台与内容矩阵","path":"01-账号规划/02-平台与内容矩阵.md"},{"title":"栏目与选题库","path":"01-账号规划/03-栏目与选题库.md"},{"title":"拍摄发布 SOP","path":"01-账号规划/04-拍摄发布SOP.md"},{"title":"数据复盘","path":"01-账号规划/05-数据复盘.md"},{"title":"执行计划（90 天）","path":"01-账号规划/06-执行计划.md"},{"title":"变现路径（后置，按顺序解锁）","path":"01-账号规划/07-变现路径.md"},{"title":"合规与风险","path":"01-账号规划/08-合规与风险.md"},{"title":"账号名","path":"01-账号规划/09-账号名排查记录.md"}]},{"title":"运营记录","icon":"bar-chart-3","items":[{"title":"发布与复盘表","path":"04-运营记录/发布与复盘表.md"}]}],"today":{"path":"05-食谱库/韭菜鸡蛋胡萝卜包.md","title":"韭菜鸡蛋胡萝卜包","note":"第 01 集 · 没有粉丝版"}}</script>
 
   <!-- 在解析阶段就把主题定下来，避免深色用户看到闪白 -->
-  <script src="__BASE__assets/theme-init.js"></script>
-  <link rel="stylesheet" href="__BASE__assets/style.css?v=__V__">
+  <script src="/assets/theme-init.js"></script>
+  <link rel="stylesheet" href="/assets/style.css?v=dev">
 </head>
-<body data-doc="__DOC__">
+  <link rel="stylesheet" href="assets/style.css?v=dev">
+</head>
+<body data-doc="01-账号规划/02-平台与内容矩阵.md">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
   <symbol id="ic-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7" />
   <path d="M12 19V5" /></symbol>
@@ -183,26 +196,86 @@
     </aside>
     <div id="backdrop"></div>
 
-    <main id="content">
-      <noscript>
-        <style>.skeleton{display:none}</style>
-        <div class="noscript">
-          <h1>毕业生食谱</h1>
-          <p>这个站点的内容由浏览器脚本加载，当前无法显示。请在浏览器设置里开启 JavaScript 后刷新。</p>
-          <p>也可以直接读仓库里的 Markdown 原文：</p>
-          <ul>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/05-%E9%A3%9F%E8%B0%B1%E5%BA%93">食谱库</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC">分集脚本</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog">完整仓库</a></li>
-          </ul>
-        </div>
-      </noscript>
-      <div class="skeleton">
-        <div class="sk-line sk-60"></div>
-        <div class="sk-line sk-90"></div>
-        <div class="sk-line sk-80"></div>
-      </div>
-    </main>
+    <main id="content"><article class="md"><h1 id="02-平台与内容矩阵">02 · 平台与内容矩阵</h1>
+<h2 id="平台分工">平台分工</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>平台</th>
+<th>角色</th>
+<th>版本</th>
+<th>时长</th>
+<th>核心指标</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>小红书</strong></td>
+<td><strong>主战场</strong></td>
+<td>完整版 + 图文配方</td>
+<td>60–90s + 图文</td>
+<td>收藏率、赞藏比</td>
+<td>面食收藏率极高，涨粉与商单最实际</td>
+</tr>
+<tr>
+<td><strong>抖音</strong></td>
+<td>引流/放量</td>
+<td>钩子短版</td>
+<td>45–60s</td>
+<td>3 秒完播、完播率</td>
+<td>标题更冲，封面加钩子字</td>
+</tr>
+<tr>
+<td><strong>B站</strong></td>
+<td>养人设/陪伴</td>
+<td>长版 + 生活流</td>
+<td>2–3min</td>
+<td>完播、三连、弹幕</td>
+<td>「一个人认真生活」人设吃香，起号慢</td>
+</tr>
+<tr>
+<td>视频号</td>
+<td>补充分发</td>
+<td>同抖音短版</td>
+<td>45–60s</td>
+<td>转发、点赞</td>
+<td>中老年面食受众多，顺手同步</td>
+</tr>
+</tbody></table></div>
+<h2 id="一鱼多吃标准流程">一鱼多吃标准流程</h2>
+<ol>
+<li>拍 1 次完整素材</li>
+<li>剪 <strong>60s 竖版</strong>（抖音/视频号）</li>
+<li>剪 <strong>90s 完整版 + 图文配方</strong>（小红书）</li>
+<li>剪 <strong>2–3min 长版</strong>（B站，可加旁白和生活片段）</li>
+</ol>
+<hr>
+<h2 id="时长与结构模板">时长与结构模板</h2>
+<h3 id="a-60-秒竖版主版抖音视频号小红书短版">A. 60 秒竖版（主版，抖音/视频号/小红书短版）</h3>
+<pre><code>0–3s    钩子：成品特写/开盖热气/掰开横截面 + 一句定位
+3–8s    空镜过渡 + 「配方放屏幕，想试的可以截图」
+8–22s   核心步骤 1（和面）
+22–35s  核心步骤 2（调馅 / 做葱油）
+35–47s  核心步骤 3（包制 / 卷制）
+47–56s  蒸制 + 开盖（情绪高点）
+56–60s  试吃 + 互动提问
+</code></pre>
+<p><strong>大字卡只保留 3 个</strong>（每条不同，例如包子：先油后盐 / 二次醒发 / 焖 3 分钟）</p>
+<h3 id="b-23-分钟长版b站小红书完整版">B. 2–3 分钟长版（B站/小红书完整版）</h3>
+<p>在 60s 骨架上加：</p>
+<ul>
+<li>失败对比镜头（塌了的 vs 成功的）</li>
+<li>生活片段（窗外、书、猫）</li>
+<li>更完整旁白和配方字幕</li>
+<li>结尾 30 秒闲聊（为什么做这个、最近在干嘛）</li>
+</ul>
+<h3 id="c-配方处理原则解决完播陷阱">C. 配方处理原则（解决完播陷阱）</h3>
+<ul>
+<li>视频里<strong>只给核心比例</strong>，分步出现，不要开头全放</li>
+<li>完整配方放 <strong>评论区置顶 + 图文笔记</strong></li>
+<li>关键句用大字卡强化</li>
+</ul>
+</article></main>
   </div>
 
   <nav class="tabbar" aria-label="主导航">
@@ -255,6 +328,6 @@
     <svg class="ic"><use href="#ic-arrow-up"/></svg>
   </button>
 
-  <script src="__BASE__assets/app.js?v=__V__" defer></script>
+  <script src="/assets/app.js?v=dev" defer></script>
 </body>
 </html>

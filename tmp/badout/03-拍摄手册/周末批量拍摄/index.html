@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-base="__BASE__">
+<html lang="zh-CN" data-base="/">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,17 +11,17 @@
   <!-- 安全策略：无内联脚本、无外部依赖、无 frame 嵌套 -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; form-action 'none'">
 
-  <title>__TITLE__</title>
-  <meta name="description" content="__DESC__">
+  <title>周末批量拍摄手册</title>
+  <meta name="description" content="适用：第 1–2 集（韭菜鸡蛋胡萝卜包 + 花卷），两条同为发面，共用面团。 分集脚本见 ../02-分集脚本/。 -- 1. 先跑通第一条。 先按流程拍完「韭菜鸡蛋胡萝卜包」，如果比预期顺，再拍「花卷」；如果累到崩">
   <meta name="author" content="毕业生食谱">
-  <link rel="canonical" href="__CANONICAL__">
+  <link rel="canonical" href="https://easyindie.github.io/03-%E6%8B%8D%E6%91%84%E6%89%8B%E5%86%8C/%E5%91%A8%E6%9C%AB%E6%89%B9%E9%87%8F%E6%8B%8D%E6%91%84/">
   <meta name="robots" content="index,follow,max-image-preview:large">
 
   <!-- 图标 / PWA -->
-  <link rel="icon" href="__BASE__assets/favicon.ico" sizes="32x32">
-  <link rel="icon" href="__BASE__assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="__BASE__assets/apple-touch-icon.png">
-  <link rel="manifest" href="__BASE__manifest.webmanifest">
+  <link rel="icon" href="/assets/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
   <meta name="application-name" content="毕业生食谱">
   <meta name="apple-mobile-web-app-title" content="毕业生食谱">
   <meta name="mobile-web-app-capable" content="yes">
@@ -32,30 +32,43 @@
   <!-- 社交分享 -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="毕业生食谱">
-  <meta property="og:title" content="__TITLE__">
-  <meta property="og:description" content="__DESC__">
-  <meta property="og:url" content="__OG_URL__">
+  <meta property="og:title" content="周末批量拍摄手册">
+  <meta property="og:description" content="适用：第 1–2 集（韭菜鸡蛋胡萝卜包 + 花卷），两条同为发面，共用面团。 分集脚本见 ../02-分集脚本/。 -- 1. 先跑通第一条。 先按流程拍完「韭菜鸡蛋胡萝卜包」，如果比预期顺，再拍「花卷」；如果累到崩">
+  <meta property="og:url" content="https://easyindie.github.io/03-%E6%8B%8D%E6%91%84%E6%89%8B%E5%86%8C/%E5%91%A8%E6%9C%AB%E6%89%B9%E9%87%8F%E6%8B%8D%E6%91%84/">
   <meta property="og:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="毕业生食谱 · 认真做饭，认真生活">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="__TITLE__">
-  <meta name="twitter:description" content="__DESC__">
+  <meta name="twitter:title" content="周末批量拍摄手册">
+  <meta name="twitter:description" content="适用：第 1–2 集（韭菜鸡蛋胡萝卜包 + 花卷），两条同为发面，共用面团。 分集脚本见 ../02-分集脚本/。 -- 1. 先跑通第一条。 先按流程拍完「韭菜鸡蛋胡萝卜包」，如果比预期顺，再拍「花卷」；如果累到崩">
   <meta name="twitter:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
 
   <!-- 结构化数据：食谱页输出 Recipe，其余输出 WebPage -->
-  <script type="application/ld+json">__JSONLD__</script>
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "周末批量拍摄手册",
+  "url": "https://easyindie.github.io/03-%E6%8B%8D%E6%91%84%E6%89%8B%E5%86%8C/%E5%91%A8%E6%9C%AB%E6%89%B9%E9%87%8F%E6%8B%8D%E6%91%84/",
+  "inLanguage": "zh-CN",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "毕业生食谱",
+    "url": "https://easyindie.github.io/"
+  }
+}</script>
 
   <!-- 导航清单内联，省掉首屏一次请求 -->
-  <script id="site-data" type="application/json">__SITE_JSON__</script>
+  <script id="site-data" type="application/json">{"generated":"2026-09-27","title":"毕业生食谱","sections":[{"title":"总览","icon":"info","items":[{"title":"项目总览","path":"README.md"}]},{"title":"食谱库","icon":"book-open","highlight":true,"items":[{"title":"食谱索引","path":"05-食谱库/00-食谱索引.md"},{"title":"花卷","path":"05-食谱库/花卷.md"},{"title":"韭菜鸡蛋胡萝卜包","path":"05-食谱库/韭菜鸡蛋胡萝卜包.md"}]},{"title":"分集脚本","icon":"clapperboard","items":[{"title":"分集索引","path":"02-分集脚本/00-分集索引.md"},{"title":"韭菜鸡蛋胡萝卜包（没有粉丝版）","path":"02-分集脚本/第01集-韭菜鸡蛋胡萝卜包.md"},{"title":"花卷","path":"02-分集脚本/第02集-花卷.md"}]},{"title":"拍摄手册","icon":"video","items":[{"title":"素材银行清单","path":"03-拍摄手册/素材银行清单.md"},{"title":"周末批量拍摄手册","path":"03-拍摄手册/周末批量拍摄.md"}]},{"title":"账号规划","icon":"clipboard-list","items":[{"title":"定位与调性","path":"01-账号规划/01-定位与调性.md"},{"title":"对外运营方案说明（可选）","path":"01-账号规划/00-说明-可选.md"},{"title":"平台与内容矩阵","path":"01-账号规划/02-平台与内容矩阵.md"},{"title":"栏目与选题库","path":"01-账号规划/03-栏目与选题库.md"},{"title":"拍摄发布 SOP","path":"01-账号规划/04-拍摄发布SOP.md"},{"title":"数据复盘","path":"01-账号规划/05-数据复盘.md"},{"title":"执行计划（90 天）","path":"01-账号规划/06-执行计划.md"},{"title":"变现路径（后置，按顺序解锁）","path":"01-账号规划/07-变现路径.md"},{"title":"合规与风险","path":"01-账号规划/08-合规与风险.md"},{"title":"账号名","path":"01-账号规划/09-账号名排查记录.md"}]},{"title":"运营记录","icon":"bar-chart-3","items":[{"title":"发布与复盘表","path":"04-运营记录/发布与复盘表.md"}]}],"today":{"path":"05-食谱库/韭菜鸡蛋胡萝卜包.md","title":"韭菜鸡蛋胡萝卜包","note":"第 01 集 · 没有粉丝版"}}</script>
 
   <!-- 在解析阶段就把主题定下来，避免深色用户看到闪白 -->
-  <script src="__BASE__assets/theme-init.js"></script>
-  <link rel="stylesheet" href="__BASE__assets/style.css?v=__V__">
+  <script src="/assets/theme-init.js"></script>
+  <link rel="stylesheet" href="/assets/style.css?v=dev">
 </head>
-<body data-doc="__DOC__">
+  <link rel="stylesheet" href="assets/style.css?v=dev">
+</head>
+<body data-doc="03-拍摄手册/周末批量拍摄.md">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
   <symbol id="ic-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7" />
   <path d="M12 19V5" /></symbol>
@@ -183,26 +196,147 @@
     </aside>
     <div id="backdrop"></div>
 
-    <main id="content">
-      <noscript>
-        <style>.skeleton{display:none}</style>
-        <div class="noscript">
-          <h1>毕业生食谱</h1>
-          <p>这个站点的内容由浏览器脚本加载，当前无法显示。请在浏览器设置里开启 JavaScript 后刷新。</p>
-          <p>也可以直接读仓库里的 Markdown 原文：</p>
-          <ul>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/05-%E9%A3%9F%E8%B0%B1%E5%BA%93">食谱库</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC">分集脚本</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog">完整仓库</a></li>
-          </ul>
-        </div>
-      </noscript>
-      <div class="skeleton">
-        <div class="sk-line sk-60"></div>
-        <div class="sk-line sk-90"></div>
-        <div class="sk-line sk-80"></div>
-      </div>
-    </main>
+    <main id="content"><article class="md"><h1 id="周末批量拍摄手册">周末批量拍摄手册</h1>
+<blockquote>
+<p>适用：第 1–2 集（韭菜鸡蛋胡萝卜包 + 花卷），两条同为发面，共用面团。
+分集脚本见 <code>../02-分集脚本/</code>。</p>
+</blockquote>
+<hr>
+<h2 id="0-拍摄前决策很重要">0. 拍摄前决策（很重要）</h2>
+<ol>
+<li><strong>先跑通第一条。</strong> 先按流程拍完「韭菜鸡蛋胡萝卜包」，如果比预期顺，再拍「花卷」；如果累到崩溃，花卷留到下次。<strong>别为了「一次拍两条」把两条都拍糊。</strong></li>
+<li><strong>共用面团</strong>：两条的包子皮/花卷面团配方完全一样（面粉 300g + 酵母 3g + 糖 5g + 温水 160g）。可一次和 <strong>2 团</strong>（各 300g），盖好一起醒。</li>
+<li><strong>和面镜头拍一次即可</strong>：两条视频都要和面，同一段画面配不同旁白可复用。想更自然就拍两条不同机位的和面。</li>
+<li><strong>醒面的 1 小时不要空等</strong>：用来拍馅、做葱油、拍空镜（素材银行）。</li>
+</ol>
+<hr>
+<h2 id="1-通用准备清单">1. 通用准备清单</h2>
+<h3 id="器材">器材</h3>
+<ul>
+<li><input disabled="" type="checkbox"> 手机 ×2（或 1 手机 + 1 相机）</li>
+<li><input disabled="" type="checkbox"> 俯拍支架（正上方机位）</li>
+<li><input disabled="" type="checkbox"> 侧机位支架（拍手部/侧脸）</li>
+<li><input disabled="" type="checkbox"> 补光灯（阴天/晚上用，暖白）</li>
+<li><input disabled="" type="checkbox"> 小蜜蜂/领夹麦（录口播）；环境原声用手机自带麦即可</li>
+</ul>
+<h3 id="道具">道具</h3>
+<ul>
+<li><input disabled="" type="checkbox"> 干净的案板、擀面杖、蒸屉 + 蒸笼纸、保鲜膜</li>
+<li><input disabled="" type="checkbox"> 白瓷盘/白碗（试吃、成品）</li>
+<li><input disabled="" type="checkbox"> 生活物件：一杯水、一本摊开的书、窗边绿植（把「宿舍」变「家」）</li>
+</ul>
+<h3 id="食材">食材</h3>
+<p><strong>面团（两条共用，各 300g）</strong></p>
+<ul>
+<li>面粉 300g ×2 ｜ 酵母 3g ｜ 糖 5g ｜ 温水 160g</li>
+</ul>
+<p><strong>包子馅</strong></p>
+<ul>
+<li>韭菜 250g ｜ 鸡蛋 4 个 ｜ 胡萝卜 1 根 ｜ 粉丝 1 把 ｜ 虾皮（可选）</li>
+<li>香油 2 勺 ｜ 蚝油 1 勺 ｜ 白胡椒 ｜ 盐（最后放）</li>
+</ul>
+<p><strong>花卷</strong></p>
+<ul>
+<li>小葱 1 把 ｜ 食用油 ｜ 盐 ｜ 花椒粉/五香粉（可选）</li>
+<li>油酥（选做）：面粉 2 勺 + 热油 3 勺</li>
+</ul>
+<h3 id="机位固定规范">机位固定规范</h3>
+<ul>
+<li>A 机：正俯拍（手部操作主体）</li>
+<li>B 机：侧 45°（拍手、侧面、蒸汽、力度感）</li>
+<li><strong>每个关键动作，两条都拍 A + B</strong>，后期二选一</li>
+</ul>
+<hr>
+<h2 id="2-拍摄时间表约-45-小时含等待">2. 拍摄时间表（约 4–5 小时，含等待）</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>时间</th>
+<th>动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0:00–0:40</td>
+<td>摆台、架机位、试光试音、备料</td>
+</tr>
+<tr>
+<td>0:40–0:55</td>
+<td><strong>和面 ×2</strong>（A/B 机），盖膜</td>
+</tr>
+<tr>
+<td>0:55–1:00</td>
+<td>拍空镜（阳光、案板、面粉、绿植）——素材银行</td>
+</tr>
+<tr>
+<td>1:00–1:40</td>
+<td>醒面等待：<strong>做包子馅</strong>（韭菜、炒蛋、炒胡萝卜、粉丝、拌馅）+ 拍</td>
+</tr>
+<tr>
+<td>1:40–2:00</td>
+<td><strong>做花卷葱油</strong> + 拍</td>
+</tr>
+<tr>
+<td>2:00–2:20</td>
+<td>醒面完成：拍面团蜂窝特写（两条共用）</td>
+</tr>
+<tr>
+<td>2:20–3:00</td>
+<td><strong>包包子</strong>（擀皮、捏褶、摆屉、二次醒发）+ 拍</td>
+</tr>
+<tr>
+<td>3:00–3:15</td>
+<td>包子冷水上锅蒸 12 分钟（水开计时）</td>
+</tr>
+<tr>
+<td>3:15–3:35</td>
+<td>蒸包子期间：<strong>擀花卷、卷花卷</strong>（第 2 集关键镜头）</td>
+</tr>
+<tr>
+<td>3:35–3:40</td>
+<td>包子开盖 + 焖 3 分钟 + <strong>试吃</strong>（第 1 集钩子&amp;结尾）</td>
+</tr>
+<tr>
+<td>3:40–4:00</td>
+<td>花卷二次醒发 + 上锅蒸 12–15 分钟</td>
+</tr>
+<tr>
+<td>4:00–4:15</td>
+<td>花卷开盖、试吃（第 2 集钩子&amp;结尾）</td>
+</tr>
+<tr>
+<td>4:15–4:45</td>
+<td>补拍：空镜、书/窗、手部特写、试吃表情、封面镜头</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p>拍摄间隙随手多录 3–5 秒「安静画面」，剪辑时当呼吸感用。</p>
+</blockquote>
+<hr>
+<h2 id="3-共用素材清单拍一次两条都能用">3. 共用素材清单（拍一次，两条都能用）</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 空镜：阳光、案板、面粉、窗边绿植、窗外（各 5–8s，横竖都拍）</li>
+<li><input disabled="" type="checkbox"> 手部特写：手沾面粉、揉面、擀面（各 3–5s）</li>
+<li><input disabled="" type="checkbox"> 蒸汽：开盖、锅盖缝隙（各 3–5s）</li>
+<li><input disabled="" type="checkbox"> 面团蜂窝特写（两条共用）</li>
+<li><input disabled="" type="checkbox"> 生活片段：摊开的书、喝水、窗外、猫（有就拍）</li>
+<li><input disabled="" type="checkbox"> 试吃镜头：两条各拍「闭眼/点头」各 2 条</li>
+<li><input disabled="" type="checkbox"> 封面镜头：包子、花卷各拍 5–8 张不同角度</li>
+</ul>
+<blockquote>
+<p>日常积累的空镜见 <code>素材银行清单.md</code>。</p>
+</blockquote>
+<hr>
+<h2 id="4-后期清单每条都走一遍">4. 后期清单（每条都走一遍）</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 片头 3 秒：成品 + 标题</li>
+<li><input disabled="" type="checkbox"> 配方分步出现（不要开头全放），完整版留评论区置顶</li>
+<li><input disabled="" type="checkbox"> 大字卡：包子=先油后盐/二次醒发/焖3分钟；花卷=葱花先拌油/卷紧再切/焖3分钟</li>
+<li><input disabled="" type="checkbox"> 原声保留：切菜、揉面、泼油、蒸汽，BGM 不压原声</li>
+<li><input disabled="" type="checkbox"> 结尾：试吃 + 互动提问</li>
+<li><input disabled="" type="checkbox"> 封面：成品 + 热气 + 「毕业生食谱」小字 + 一句钩子</li>
+<li><input disabled="" type="checkbox"> 导出 60s 竖版；另存长版素材文件夹</li>
+</ul>
+</article></main>
   </div>
 
   <nav class="tabbar" aria-label="主导航">
@@ -255,6 +389,6 @@
     <svg class="ic"><use href="#ic-arrow-up"/></svg>
   </button>
 
-  <script src="__BASE__assets/app.js?v=__V__" defer></script>
+  <script src="/assets/app.js?v=dev" defer></script>
 </body>
 </html>

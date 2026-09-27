@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-base="__BASE__">
+<html lang="zh-CN" data-base="/">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,17 +11,17 @@
   <!-- 安全策略：无内联脚本、无外部依赖、无 frame 嵌套 -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; form-action 'none'">
 
-  <title>__TITLE__</title>
-  <meta name="description" content="__DESC__">
+  <title>栏目与选题库</title>
+  <meta name="description" content="栏目 内容 示例标题 --- --- --- 今天做 包子、馒头、饺子、面条 毕业生食谱｜猪肉大葱包，汁水多一点 冰箱清库存 剩菜变馅，真实省钱 毕业生食谱｜冰箱只剩半根胡萝卜 翻车日记 面没发、馅出水、包子塌 毕业">
   <meta name="author" content="毕业生食谱">
-  <link rel="canonical" href="__CANONICAL__">
+  <link rel="canonical" href="https://easyindie.github.io/01-%E8%B4%A6%E5%8F%B7%E8%A7%84%E5%88%92/03-%E6%A0%8F%E7%9B%AE%E4%B8%8E%E9%80%89%E9%A2%98%E5%BA%93/">
   <meta name="robots" content="index,follow,max-image-preview:large">
 
   <!-- 图标 / PWA -->
-  <link rel="icon" href="__BASE__assets/favicon.ico" sizes="32x32">
-  <link rel="icon" href="__BASE__assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="__BASE__assets/apple-touch-icon.png">
-  <link rel="manifest" href="__BASE__manifest.webmanifest">
+  <link rel="icon" href="/assets/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
   <meta name="application-name" content="毕业生食谱">
   <meta name="apple-mobile-web-app-title" content="毕业生食谱">
   <meta name="mobile-web-app-capable" content="yes">
@@ -32,30 +32,43 @@
   <!-- 社交分享 -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="毕业生食谱">
-  <meta property="og:title" content="__TITLE__">
-  <meta property="og:description" content="__DESC__">
-  <meta property="og:url" content="__OG_URL__">
+  <meta property="og:title" content="栏目与选题库">
+  <meta property="og:description" content="栏目 内容 示例标题 --- --- --- 今天做 包子、馒头、饺子、面条 毕业生食谱｜猪肉大葱包，汁水多一点 冰箱清库存 剩菜变馅，真实省钱 毕业生食谱｜冰箱只剩半根胡萝卜 翻车日记 面没发、馅出水、包子塌 毕业">
+  <meta property="og:url" content="https://easyindie.github.io/01-%E8%B4%A6%E5%8F%B7%E8%A7%84%E5%88%92/03-%E6%A0%8F%E7%9B%AE%E4%B8%8E%E9%80%89%E9%A2%98%E5%BA%93/">
   <meta property="og:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="毕业生食谱 · 认真做饭，认真生活">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="__TITLE__">
-  <meta name="twitter:description" content="__DESC__">
+  <meta name="twitter:title" content="栏目与选题库">
+  <meta name="twitter:description" content="栏目 内容 示例标题 --- --- --- 今天做 包子、馒头、饺子、面条 毕业生食谱｜猪肉大葱包，汁水多一点 冰箱清库存 剩菜变馅，真实省钱 毕业生食谱｜冰箱只剩半根胡萝卜 翻车日记 面没发、馅出水、包子塌 毕业">
   <meta name="twitter:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
 
   <!-- 结构化数据：食谱页输出 Recipe，其余输出 WebPage -->
-  <script type="application/ld+json">__JSONLD__</script>
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "栏目与选题库",
+  "url": "https://easyindie.github.io/01-%E8%B4%A6%E5%8F%B7%E8%A7%84%E5%88%92/03-%E6%A0%8F%E7%9B%AE%E4%B8%8E%E9%80%89%E9%A2%98%E5%BA%93/",
+  "inLanguage": "zh-CN",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "毕业生食谱",
+    "url": "https://easyindie.github.io/"
+  }
+}</script>
 
   <!-- 导航清单内联，省掉首屏一次请求 -->
-  <script id="site-data" type="application/json">__SITE_JSON__</script>
+  <script id="site-data" type="application/json">{"generated":"2026-09-27","title":"毕业生食谱","sections":[{"title":"总览","icon":"info","items":[{"title":"项目总览","path":"README.md"}]},{"title":"食谱库","icon":"book-open","highlight":true,"items":[{"title":"食谱索引","path":"05-食谱库/00-食谱索引.md"},{"title":"花卷","path":"05-食谱库/花卷.md"},{"title":"韭菜鸡蛋胡萝卜包","path":"05-食谱库/韭菜鸡蛋胡萝卜包.md"}]},{"title":"分集脚本","icon":"clapperboard","items":[{"title":"分集索引","path":"02-分集脚本/00-分集索引.md"},{"title":"韭菜鸡蛋胡萝卜包（没有粉丝版）","path":"02-分集脚本/第01集-韭菜鸡蛋胡萝卜包.md"},{"title":"花卷","path":"02-分集脚本/第02集-花卷.md"}]},{"title":"拍摄手册","icon":"video","items":[{"title":"素材银行清单","path":"03-拍摄手册/素材银行清单.md"},{"title":"周末批量拍摄手册","path":"03-拍摄手册/周末批量拍摄.md"}]},{"title":"账号规划","icon":"clipboard-list","items":[{"title":"定位与调性","path":"01-账号规划/01-定位与调性.md"},{"title":"对外运营方案说明（可选）","path":"01-账号规划/00-说明-可选.md"},{"title":"平台与内容矩阵","path":"01-账号规划/02-平台与内容矩阵.md"},{"title":"栏目与选题库","path":"01-账号规划/03-栏目与选题库.md"},{"title":"拍摄发布 SOP","path":"01-账号规划/04-拍摄发布SOP.md"},{"title":"数据复盘","path":"01-账号规划/05-数据复盘.md"},{"title":"执行计划（90 天）","path":"01-账号规划/06-执行计划.md"},{"title":"变现路径（后置，按顺序解锁）","path":"01-账号规划/07-变现路径.md"},{"title":"合规与风险","path":"01-账号规划/08-合规与风险.md"},{"title":"账号名","path":"01-账号规划/09-账号名排查记录.md"}]},{"title":"运营记录","icon":"bar-chart-3","items":[{"title":"发布与复盘表","path":"04-运营记录/发布与复盘表.md"}]}],"today":{"path":"05-食谱库/韭菜鸡蛋胡萝卜包.md","title":"韭菜鸡蛋胡萝卜包","note":"第 01 集 · 没有粉丝版"}}</script>
 
   <!-- 在解析阶段就把主题定下来，避免深色用户看到闪白 -->
-  <script src="__BASE__assets/theme-init.js"></script>
-  <link rel="stylesheet" href="__BASE__assets/style.css?v=__V__">
+  <script src="/assets/theme-init.js"></script>
+  <link rel="stylesheet" href="/assets/style.css?v=dev">
 </head>
-<body data-doc="__DOC__">
+  <link rel="stylesheet" href="assets/style.css?v=dev">
+</head>
+<body data-doc="01-账号规划/03-栏目与选题库.md">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
   <symbol id="ic-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7" />
   <path d="M12 19V5" /></symbol>
@@ -183,26 +196,133 @@
     </aside>
     <div id="backdrop"></div>
 
-    <main id="content">
-      <noscript>
-        <style>.skeleton{display:none}</style>
-        <div class="noscript">
-          <h1>毕业生食谱</h1>
-          <p>这个站点的内容由浏览器脚本加载，当前无法显示。请在浏览器设置里开启 JavaScript 后刷新。</p>
-          <p>也可以直接读仓库里的 Markdown 原文：</p>
-          <ul>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/05-%E9%A3%9F%E8%B0%B1%E5%BA%93">食谱库</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC">分集脚本</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog">完整仓库</a></li>
-          </ul>
-        </div>
-      </noscript>
-      <div class="skeleton">
-        <div class="sk-line sk-60"></div>
-        <div class="sk-line sk-90"></div>
-        <div class="sk-line sk-80"></div>
-      </div>
-    </main>
+    <main id="content"><article class="md"><h1 id="03-栏目与选题库">03 · 栏目与选题库</h1>
+<h2 id="固定栏目">固定栏目</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>栏目</th>
+<th>内容</th>
+<th>示例标题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>今天做______</td>
+<td>包子、馒头、饺子、面条</td>
+<td>毕业生食谱｜猪肉大葱包，汁水多一点</td>
+</tr>
+<tr>
+<td>冰箱清库存</td>
+<td>剩菜变馅，真实省钱</td>
+<td>毕业生食谱｜冰箱只剩半根胡萝卜</td>
+</tr>
+<tr>
+<td>翻车日记</td>
+<td>面没发、馅出水、包子塌</td>
+<td>毕业生食谱｜第一次做生煎包，翻车了但好吃</td>
+</tr>
+<tr>
+<td>今天没出门</td>
+<td>纯记录，阳光做饭吃饭</td>
+<td>毕业生食谱｜下雨天，在家包饺子</td>
+</tr>
+<tr>
+<td>哥们来家里</td>
+<td>室友/朋友试吃，互动</td>
+<td>毕业生食谱｜室友来吃饭，蒸一锅包子</td>
+</tr>
+<tr>
+<td>节气吃什么</td>
+<td>立秋、冬至、春天韭菜</td>
+<td>毕业生食谱｜冬至包饺子</td>
+</tr>
+<tr>
+<td>一个人怎么省钱</td>
+<td>大份、管饱、冻起来</td>
+<td>毕业生食谱｜一次做 20 个包子，冻一周早饭</td>
+</tr>
+</tbody></table></div>
+<blockquote>
+<p>「哥们来家里」「一个人怎么省钱」为男生版新增，强化踏实与实用标签。</p>
+</blockquote>
+<hr>
+<h2 id="选题库20顺序可换">选题库（20+，顺序可换）</h2>
+<h3 id="前-10-集建议顺序先立人设再教技术">前 10 集建议顺序（先立人设，再教技术）</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>集号</th>
+<th>选题</th>
+<th>意图</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td>韭菜鸡蛋胡萝卜包</td>
+<td>首条，新手感最强</td>
+</tr>
+<tr>
+<td>02</td>
+<td>第一次做花卷，卷得丑但成功</td>
+<td>真实感</td>
+</tr>
+<tr>
+<td>03</td>
+<td>冰箱清库存：半根胡萝卜做的包子</td>
+<td>省钱/真实</td>
+</tr>
+<tr>
+<td>04</td>
+<td>馒头为什么又硬又黄？我踩了 3 个坑</td>
+<td>教学 + 翻车</td>
+</tr>
+<tr>
+<td>05</td>
+<td>下雨天，在家包饺子</td>
+<td>纯记录</td>
+</tr>
+<tr>
+<td>06</td>
+<td>猪肉大葱包，汁水多一点</td>
+<td>常规爆款款</td>
+</tr>
+<tr>
+<td>07</td>
+<td>生煎包翻车实录</td>
+<td>互动最高</td>
+</tr>
+<tr>
+<td>08</td>
+<td>室友来家里，蒸了一锅包子</td>
+<td>互动/栏目</td>
+</tr>
+<tr>
+<td>09</td>
+<td>葱油饼，比想象中简单</td>
+<td>教学</td>
+</tr>
+<tr>
+<td>10</td>
+<td>全麦包子，健康但难吃，我诚实说</td>
+<td>真实感</td>
+</tr>
+</tbody></table></div>
+<h3 id="其余题库">其余题库</h3>
+<p>豆沙包 / 香菇青菜包 / 豆腐粉条包 / 南瓜馒头 / 紫薯包 / 糖三角 / 酸菜粉丝包 / 酱肉包 / 手擀面 / 馄饨 / 馅饼 / 烧麦 / 一次做 20 个冻起来 / 最便宜的饱饭</p>
+<hr>
+<h2 id="标题公式">标题公式</h2>
+<p><strong>毕业生食谱｜食物 + 情绪/场景/卖点/翻车</strong></p>
+<ul>
+<li>毕业生食谱｜韭菜鸡蛋胡萝卜包，新手一次成功</li>
+<li>毕业生食谱｜周末蒸一锅花卷，满屋面香</li>
+<li>毕业生食谱｜下雨天，在家包饺子</li>
+<li>毕业生食谱｜第一次做生煎包，翻车了但好吃</li>
+<li>毕业生食谱｜室友来家里，蒸一锅猪肉大葱包</li>
+<li>毕业生食谱｜今天只做饭，不想别的</li>
+</ul>
+<h2 id="标签">标签</h2>
+<p>#毕业生食谱 #日常vlog #面食 #新手做饭 #一个人做饭</p>
+</article></main>
   </div>
 
   <nav class="tabbar" aria-label="主导航">
@@ -255,6 +375,6 @@
     <svg class="ic"><use href="#ic-arrow-up"/></svg>
   </button>
 
-  <script src="__BASE__assets/app.js?v=__V__" defer></script>
+  <script src="/assets/app.js?v=dev" defer></script>
 </body>
 </html>

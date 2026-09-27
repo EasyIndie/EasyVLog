@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-base="__BASE__">
+<html lang="zh-CN" data-base="/">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,17 +11,17 @@
   <!-- 安全策略：无内联脚本、无外部依赖、无 frame 嵌套 -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; form-action 'none'">
 
-  <title>__TITLE__</title>
-  <meta name="description" content="__DESC__">
+  <title>分集索引</title>
+  <meta name="description" content="对外运营（可选）｜⚠️ 本文件由 scripts/build-index.mjs 自动生成，不要手改。 数据来源：各集 md 的 front matter + data/backlog.json 重建命令：node">
   <meta name="author" content="毕业生食谱">
-  <link rel="canonical" href="__CANONICAL__">
+  <link rel="canonical" href="https://easyindie.github.io/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC/00-%E5%88%86%E9%9B%86%E7%B4%A2%E5%BC%95/">
   <meta name="robots" content="index,follow,max-image-preview:large">
 
   <!-- 图标 / PWA -->
-  <link rel="icon" href="__BASE__assets/favicon.ico" sizes="32x32">
-  <link rel="icon" href="__BASE__assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="__BASE__assets/apple-touch-icon.png">
-  <link rel="manifest" href="__BASE__manifest.webmanifest">
+  <link rel="icon" href="/assets/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
   <meta name="application-name" content="毕业生食谱">
   <meta name="apple-mobile-web-app-title" content="毕业生食谱">
   <meta name="mobile-web-app-capable" content="yes">
@@ -32,30 +32,43 @@
   <!-- 社交分享 -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="毕业生食谱">
-  <meta property="og:title" content="__TITLE__">
-  <meta property="og:description" content="__DESC__">
-  <meta property="og:url" content="__OG_URL__">
+  <meta property="og:title" content="分集索引">
+  <meta property="og:description" content="对外运营（可选）｜⚠️ 本文件由 scripts/build-index.mjs 自动生成，不要手改。 数据来源：各集 md 的 front matter + data/backlog.json 重建命令：node">
+  <meta property="og:url" content="https://easyindie.github.io/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC/00-%E5%88%86%E9%9B%86%E7%B4%A2%E5%BC%95/">
   <meta property="og:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="毕业生食谱 · 认真做饭，认真生活">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="__TITLE__">
-  <meta name="twitter:description" content="__DESC__">
+  <meta name="twitter:title" content="分集索引">
+  <meta name="twitter:description" content="对外运营（可选）｜⚠️ 本文件由 scripts/build-index.mjs 自动生成，不要手改。 数据来源：各集 md 的 front matter + data/backlog.json 重建命令：node">
   <meta name="twitter:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
 
   <!-- 结构化数据：食谱页输出 Recipe，其余输出 WebPage -->
-  <script type="application/ld+json">__JSONLD__</script>
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "分集索引",
+  "url": "https://easyindie.github.io/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC/00-%E5%88%86%E9%9B%86%E7%B4%A2%E5%BC%95/",
+  "inLanguage": "zh-CN",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "毕业生食谱",
+    "url": "https://easyindie.github.io/"
+  }
+}</script>
 
   <!-- 导航清单内联，省掉首屏一次请求 -->
-  <script id="site-data" type="application/json">__SITE_JSON__</script>
+  <script id="site-data" type="application/json">{"generated":"2026-09-27","title":"毕业生食谱","sections":[{"title":"总览","icon":"info","items":[{"title":"项目总览","path":"README.md"}]},{"title":"食谱库","icon":"book-open","highlight":true,"items":[{"title":"食谱索引","path":"05-食谱库/00-食谱索引.md"},{"title":"花卷","path":"05-食谱库/花卷.md"},{"title":"韭菜鸡蛋胡萝卜包","path":"05-食谱库/韭菜鸡蛋胡萝卜包.md"}]},{"title":"分集脚本","icon":"clapperboard","items":[{"title":"分集索引","path":"02-分集脚本/00-分集索引.md"},{"title":"韭菜鸡蛋胡萝卜包（没有粉丝版）","path":"02-分集脚本/第01集-韭菜鸡蛋胡萝卜包.md"},{"title":"花卷","path":"02-分集脚本/第02集-花卷.md"}]},{"title":"拍摄手册","icon":"video","items":[{"title":"素材银行清单","path":"03-拍摄手册/素材银行清单.md"},{"title":"周末批量拍摄手册","path":"03-拍摄手册/周末批量拍摄.md"}]},{"title":"账号规划","icon":"clipboard-list","items":[{"title":"定位与调性","path":"01-账号规划/01-定位与调性.md"},{"title":"对外运营方案说明（可选）","path":"01-账号规划/00-说明-可选.md"},{"title":"平台与内容矩阵","path":"01-账号规划/02-平台与内容矩阵.md"},{"title":"栏目与选题库","path":"01-账号规划/03-栏目与选题库.md"},{"title":"拍摄发布 SOP","path":"01-账号规划/04-拍摄发布SOP.md"},{"title":"数据复盘","path":"01-账号规划/05-数据复盘.md"},{"title":"执行计划（90 天）","path":"01-账号规划/06-执行计划.md"},{"title":"变现路径（后置，按顺序解锁）","path":"01-账号规划/07-变现路径.md"},{"title":"合规与风险","path":"01-账号规划/08-合规与风险.md"},{"title":"账号名","path":"01-账号规划/09-账号名排查记录.md"}]},{"title":"运营记录","icon":"bar-chart-3","items":[{"title":"发布与复盘表","path":"04-运营记录/发布与复盘表.md"}]}],"today":{"path":"05-食谱库/韭菜鸡蛋胡萝卜包.md","title":"韭菜鸡蛋胡萝卜包","note":"第 01 集 · 没有粉丝版"}}</script>
 
   <!-- 在解析阶段就把主题定下来，避免深色用户看到闪白 -->
-  <script src="__BASE__assets/theme-init.js"></script>
-  <link rel="stylesheet" href="__BASE__assets/style.css?v=__V__">
+  <script src="/assets/theme-init.js"></script>
+  <link rel="stylesheet" href="/assets/style.css?v=dev">
 </head>
-<body data-doc="__DOC__">
+  <link rel="stylesheet" href="assets/style.css?v=dev">
+</head>
+<body data-doc="02-分集脚本/00-分集索引.md">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
   <symbol id="ic-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7" />
   <path d="M12 19V5" /></symbol>
@@ -183,26 +196,105 @@
     </aside>
     <div id="backdrop"></div>
 
-    <main id="content">
-      <noscript>
-        <style>.skeleton{display:none}</style>
-        <div class="noscript">
-          <h1>毕业生食谱</h1>
-          <p>这个站点的内容由浏览器脚本加载，当前无法显示。请在浏览器设置里开启 JavaScript 后刷新。</p>
-          <p>也可以直接读仓库里的 Markdown 原文：</p>
-          <ul>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/05-%E9%A3%9F%E8%B0%B1%E5%BA%93">食谱库</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC">分集脚本</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog">完整仓库</a></li>
-          </ul>
-        </div>
-      </noscript>
-      <div class="skeleton">
-        <div class="sk-line sk-60"></div>
-        <div class="sk-line sk-90"></div>
-        <div class="sk-line sk-80"></div>
-      </div>
-    </main>
+    <main id="content"><article class="md"><h1 id="00-分集索引">00 · 分集索引</h1>
+<blockquote>
+<p><strong>对外运营（可选）</strong>｜⚠️ 本文件由 <code>scripts/build-index.mjs</code> 自动生成，<strong>不要手改</strong>。
+数据来源：各集 md 的 front matter + <code>data/backlog.json</code>
+重建命令：<code>node scripts/build-index.mjs</code>　｜　最后生成：2026-09-27</p>
+</blockquote>
+<h2 id="已建脚本">已建脚本</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>集号</th>
+<th>标题</th>
+<th>栏目</th>
+<th>状态</th>
+<th>脚本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td>韭菜鸡蛋胡萝卜包（没有粉丝版）</td>
+<td>今天做______</td>
+<td>📝 脚本</td>
+<td><a href="/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC/%E7%AC%AC01%E9%9B%86-%E9%9F%AD%E8%8F%9C%E9%B8%A1%E8%9B%8B%E8%83%A1%E8%90%9D%E5%8D%9C%E5%8C%85/" data-doc="02-分集脚本/第01集-韭菜鸡蛋胡萝卜包.md">打开</a></td>
+</tr>
+<tr>
+<td>02</td>
+<td>花卷</td>
+<td>今天做______</td>
+<td>📝 脚本</td>
+<td><a href="/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC/%E7%AC%AC02%E9%9B%86-%E8%8A%B1%E5%8D%B7/" data-doc="02-分集脚本/第02集-花卷.md">打开</a></td>
+</tr>
+</tbody></table></div>
+<h2 id="选题池未建脚本">选题池（未建脚本）</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>集号</th>
+<th>标题</th>
+<th>栏目</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>03</td>
+<td>冰箱清库存：半根胡萝卜做的包子</td>
+<td>冰箱清库存</td>
+</tr>
+<tr>
+<td>04</td>
+<td>馒头为什么又硬又黄？我踩了 3 个坑</td>
+<td>翻车日记</td>
+</tr>
+<tr>
+<td>05</td>
+<td>下雨天，在家包饺子</td>
+<td>今天没出门</td>
+</tr>
+<tr>
+<td>06</td>
+<td>猪肉大葱包，汁水多一点</td>
+<td>今天做______</td>
+</tr>
+<tr>
+<td>07</td>
+<td>第一次做生煎包，翻车实录</td>
+<td>翻车日记</td>
+</tr>
+<tr>
+<td>08</td>
+<td>室友来家里，蒸一锅包子</td>
+<td>哥们来家里</td>
+</tr>
+<tr>
+<td>09</td>
+<td>葱油饼，比想象中简单</td>
+<td>今天做______</td>
+</tr>
+<tr>
+<td>10</td>
+<td>全麦包子，健康但难吃，我诚实说</td>
+<td>今天做______</td>
+</tr>
+<tr>
+<td>11</td>
+<td>有粉丝了，做一版有粉丝的包子（彩蛋）</td>
+<td>彩蛋回访</td>
+</tr>
+</tbody></table></div>
+<h2 id="状态说明">状态说明</h2>
+<ul>
+<li>💡 选题：只在选题池里</li>
+<li>📝 脚本：已写分镜脚本</li>
+<li>🎬 待拍 / 已拍：进入拍摄流程</li>
+<li>🚀 已发：已发布</li>
+</ul>
+<h2 id="新增一集">新增一集</h2>
+<pre><code class="language-bash">node scripts/new-episode.mjs &quot;标题&quot; --series &quot;栏目&quot;
+</code></pre>
+<p>该命令会从 <code>_template.md</code> 生成骨架并自动重建本索引。</p>
+</article></main>
   </div>
 
   <nav class="tabbar" aria-label="主导航">
@@ -255,6 +347,6 @@
     <svg class="ic"><use href="#ic-arrow-up"/></svg>
   </button>
 
-  <script src="__BASE__assets/app.js?v=__V__" defer></script>
+  <script src="/assets/app.js?v=dev" defer></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN" data-base="__BASE__">
+<html lang="zh-CN" data-base="/">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -11,17 +11,17 @@
   <!-- 安全策略：无内联脚本、无外部依赖、无 frame 嵌套 -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; form-action 'none'">
 
-  <title>__TITLE__</title>
-  <meta name="description" content="__DESC__">
+  <title>发布与复盘表</title>
+  <meta name="description" content="每条发布后 24h 填一次，一周汇总对照 ../01-账号规划/05-数据复盘.md。 阈值参考：3 秒完播 ≥35% ｜ 完播率 ≥20% ｜ 收藏率 ≥2% ｜ 互动率 ≥3% 集号 标题 栏目 平台 发布时间">
   <meta name="author" content="毕业生食谱">
-  <link rel="canonical" href="__CANONICAL__">
+  <link rel="canonical" href="https://easyindie.github.io/04-%E8%BF%90%E8%90%A5%E8%AE%B0%E5%BD%95/%E5%8F%91%E5%B8%83%E4%B8%8E%E5%A4%8D%E7%9B%98%E8%A1%A8/">
   <meta name="robots" content="index,follow,max-image-preview:large">
 
   <!-- 图标 / PWA -->
-  <link rel="icon" href="__BASE__assets/favicon.ico" sizes="32x32">
-  <link rel="icon" href="__BASE__assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="__BASE__assets/apple-touch-icon.png">
-  <link rel="manifest" href="__BASE__manifest.webmanifest">
+  <link rel="icon" href="/assets/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
   <meta name="application-name" content="毕业生食谱">
   <meta name="apple-mobile-web-app-title" content="毕业生食谱">
   <meta name="mobile-web-app-capable" content="yes">
@@ -32,30 +32,43 @@
   <!-- 社交分享 -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="毕业生食谱">
-  <meta property="og:title" content="__TITLE__">
-  <meta property="og:description" content="__DESC__">
-  <meta property="og:url" content="__OG_URL__">
+  <meta property="og:title" content="发布与复盘表">
+  <meta property="og:description" content="每条发布后 24h 填一次，一周汇总对照 ../01-账号规划/05-数据复盘.md。 阈值参考：3 秒完播 ≥35% ｜ 完播率 ≥20% ｜ 收藏率 ≥2% ｜ 互动率 ≥3% 集号 标题 栏目 平台 发布时间">
+  <meta property="og:url" content="https://easyindie.github.io/04-%E8%BF%90%E8%90%A5%E8%AE%B0%E5%BD%95/%E5%8F%91%E5%B8%83%E4%B8%8E%E5%A4%8D%E7%9B%98%E8%A1%A8/">
   <meta property="og:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="毕业生食谱 · 认真做饭，认真生活">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="__TITLE__">
-  <meta name="twitter:description" content="__DESC__">
+  <meta name="twitter:title" content="发布与复盘表">
+  <meta name="twitter:description" content="每条发布后 24h 填一次，一周汇总对照 ../01-账号规划/05-数据复盘.md。 阈值参考：3 秒完播 ≥35% ｜ 完播率 ≥20% ｜ 收藏率 ≥2% ｜ 互动率 ≥3% 集号 标题 栏目 平台 发布时间">
   <meta name="twitter:image" content="https://easyindie.github.io/easyvlog/assets/og.png">
 
   <!-- 结构化数据：食谱页输出 Recipe，其余输出 WebPage -->
-  <script type="application/ld+json">__JSONLD__</script>
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "发布与复盘表",
+  "url": "https://easyindie.github.io/04-%E8%BF%90%E8%90%A5%E8%AE%B0%E5%BD%95/%E5%8F%91%E5%B8%83%E4%B8%8E%E5%A4%8D%E7%9B%98%E8%A1%A8/",
+  "inLanguage": "zh-CN",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "毕业生食谱",
+    "url": "https://easyindie.github.io/"
+  }
+}</script>
 
   <!-- 导航清单内联，省掉首屏一次请求 -->
-  <script id="site-data" type="application/json">__SITE_JSON__</script>
+  <script id="site-data" type="application/json">{"generated":"2026-09-27","title":"毕业生食谱","sections":[{"title":"总览","icon":"info","items":[{"title":"项目总览","path":"README.md"}]},{"title":"食谱库","icon":"book-open","highlight":true,"items":[{"title":"食谱索引","path":"05-食谱库/00-食谱索引.md"},{"title":"花卷","path":"05-食谱库/花卷.md"},{"title":"韭菜鸡蛋胡萝卜包","path":"05-食谱库/韭菜鸡蛋胡萝卜包.md"}]},{"title":"分集脚本","icon":"clapperboard","items":[{"title":"分集索引","path":"02-分集脚本/00-分集索引.md"},{"title":"韭菜鸡蛋胡萝卜包（没有粉丝版）","path":"02-分集脚本/第01集-韭菜鸡蛋胡萝卜包.md"},{"title":"花卷","path":"02-分集脚本/第02集-花卷.md"}]},{"title":"拍摄手册","icon":"video","items":[{"title":"素材银行清单","path":"03-拍摄手册/素材银行清单.md"},{"title":"周末批量拍摄手册","path":"03-拍摄手册/周末批量拍摄.md"}]},{"title":"账号规划","icon":"clipboard-list","items":[{"title":"定位与调性","path":"01-账号规划/01-定位与调性.md"},{"title":"对外运营方案说明（可选）","path":"01-账号规划/00-说明-可选.md"},{"title":"平台与内容矩阵","path":"01-账号规划/02-平台与内容矩阵.md"},{"title":"栏目与选题库","path":"01-账号规划/03-栏目与选题库.md"},{"title":"拍摄发布 SOP","path":"01-账号规划/04-拍摄发布SOP.md"},{"title":"数据复盘","path":"01-账号规划/05-数据复盘.md"},{"title":"执行计划（90 天）","path":"01-账号规划/06-执行计划.md"},{"title":"变现路径（后置，按顺序解锁）","path":"01-账号规划/07-变现路径.md"},{"title":"合规与风险","path":"01-账号规划/08-合规与风险.md"},{"title":"账号名","path":"01-账号规划/09-账号名排查记录.md"}]},{"title":"运营记录","icon":"bar-chart-3","items":[{"title":"发布与复盘表","path":"04-运营记录/发布与复盘表.md"}]}],"today":{"path":"05-食谱库/韭菜鸡蛋胡萝卜包.md","title":"韭菜鸡蛋胡萝卜包","note":"第 01 集 · 没有粉丝版"}}</script>
 
   <!-- 在解析阶段就把主题定下来，避免深色用户看到闪白 -->
-  <script src="__BASE__assets/theme-init.js"></script>
-  <link rel="stylesheet" href="__BASE__assets/style.css?v=__V__">
+  <script src="/assets/theme-init.js"></script>
+  <link rel="stylesheet" href="/assets/style.css?v=dev">
 </head>
-<body data-doc="__DOC__">
+  <link rel="stylesheet" href="assets/style.css?v=dev">
+</head>
+<body data-doc="04-运营记录/发布与复盘表.md">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
   <symbol id="ic-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7" />
   <path d="M12 19V5" /></symbol>
@@ -183,26 +196,147 @@
     </aside>
     <div id="backdrop"></div>
 
-    <main id="content">
-      <noscript>
-        <style>.skeleton{display:none}</style>
-        <div class="noscript">
-          <h1>毕业生食谱</h1>
-          <p>这个站点的内容由浏览器脚本加载，当前无法显示。请在浏览器设置里开启 JavaScript 后刷新。</p>
-          <p>也可以直接读仓库里的 Markdown 原文：</p>
-          <ul>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/05-%E9%A3%9F%E8%B0%B1%E5%BA%93">食谱库</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog/tree/main/02-%E5%88%86%E9%9B%86%E8%84%9A%E6%9C%AC">分集脚本</a></li>
-            <li><a href="https://github.com/EasyIndie/easyvlog">完整仓库</a></li>
-          </ul>
-        </div>
-      </noscript>
-      <div class="skeleton">
-        <div class="sk-line sk-60"></div>
-        <div class="sk-line sk-90"></div>
-        <div class="sk-line sk-80"></div>
-      </div>
-    </main>
+    <main id="content"><article class="md"><h1 id="发布与复盘表">发布与复盘表</h1>
+<blockquote>
+<p>每条发布后 24h 填一次，一周汇总对照 <code>../01-账号规划/05-数据复盘.md</code>。
+阈值参考：3 秒完播 ≥35% ｜ 完播率 ≥20% ｜ 收藏率 ≥2% ｜ 互动率 ≥3%</p>
+</blockquote>
+<h2 id="记录表">记录表</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>集号</th>
+<th>标题</th>
+<th>栏目</th>
+<th>平台</th>
+<th>发布时间</th>
+<th>播放/曝光</th>
+<th>3 秒完播</th>
+<th>完播率</th>
+<th>收藏率</th>
+<th>互动率</th>
+<th>结论/下条调整</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>01</td>
+<td>韭菜鸡蛋胡萝卜包</td>
+<td>今天做</td>
+<td>小红书</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>01</td>
+<td>韭菜鸡蛋胡萝卜包</td>
+<td>今天做</td>
+<td>抖音</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>02</td>
+<td>花卷</td>
+<td>今天做</td>
+<td>小红书</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>02</td>
+<td>花卷</td>
+<td>今天做</td>
+<td>抖音</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="单条详细复盘模板">单条详细复盘模板</h2>
+<pre><code>集号：
+标题：
+平台：
+发布时间：
+
+数据：
+  曝光/播放：
+  3 秒完播率：
+  完播率：
+  收藏率：
+  互动率：
+  转粉率：
+  评论关键词：
+
+诊断（对照 05-数据复盘）：
+  - 3 秒低 → 开头/封面问题
+  - 完播低 → 节奏拖沓、配方太早给
+  - 收藏高但涨粉低 → 缺人设
+  - 播放高但 3 秒低 → 封面/标题误导
+
+下一条动作：
+  □ 复制本条结构
+  □ 换开头/封面
+  □ 换栏目
+</code></pre>
+<hr>
+<h2 id="每周汇总">每周汇总</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>周次</th>
+<th>更新条数</th>
+<th>总播放</th>
+<th>最好的一条</th>
+<th>涨粉</th>
+<th>本周结论</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>第 1 周</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>第 2 周</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>第 3 周</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table></div>
+</article></main>
   </div>
 
   <nav class="tabbar" aria-label="主导航">
@@ -255,6 +389,6 @@
     <svg class="ic"><use href="#ic-arrow-up"/></svg>
   </button>
 
-  <script src="__BASE__assets/app.js?v=__V__" defer></script>
+  <script src="/assets/app.js?v=dev" defer></script>
 </body>
 </html>

@@ -345,3 +345,35 @@ P1 里的 **P1-1 按下反馈** 和 **P1-5 删掉 font-smoothing** 同样只改�
 - **P1-6 表格横滑提示** —— 本轮靠"末列可换行"绕过了，列数更多的表仍需要右缘渐变遮罩。
 - **P1-7 滚动时顶栏显示当前小节名**、**P1-8 标题锚点复制链接**。
 - **P2-1 基本信息 meta 条**（收益最大的一项内容呈现改动）、**P2-2 `--pre-bg` 令牌**、**P2-3 毛玻璃降到 `blur(8px)` 94%**、**P2-4 删 `text-rendering`**。
+
+---
+
+## 七、顺带修掉的一个真 bug（2026-09-27）
+
+改完回头核对线上产物时发现的，**跟本轮 UI 改动无关，是更早就存在的**：
+
+`index.html` 里残留了一段多余的 `</head>`，后面又跟了一份 head 内容：
+
+```html
+  <link rel="stylesheet" href="__BASE__assets/style.css?v=__V__">
+</head>
+  <meta name="twitter:image" content="...">
+  <link rel="stylesheet" href="assets/style.css?v=__V__">   <!-- 相对路径，没走 __BASE__ -->
+</head>
+```
+
+后果：
+- **每个深层页都会多发一次 404 请求**。根页看不出来，因为相对路径恰好等于绝对路径；
+  但在 `/easyvlog/05-食谱库/韭菜鸡蛋胡萝卜包/` 下，`assets/style.css` 解析成
+  `/easyvlog/05-食谱库/韭菜鸡蛋胡萝卜包/assets/style.css`，不存在。
+- `<meta name="twitter:image">` 落在 `</head>` 之后（浏览器会把它当 head 内容处理，所以功能上没坏，
+  但结构是错的，容易在后续编辑中出错）。
+
+修法：删掉那段残留。并在 `build-static.mjs` 里加了 `validatePage()` 断言，
+对**每个生成页面**校验三件事，任一不过就让构建失败：
+
+1. `rel="stylesheet"` 的 link 恰好 1 个；
+2. 没有未替换 `__BASE__` 的相对资源路径（`href="assets/…"` / `src="assets/…"`）；
+3. `</head>` 恰好出现 1 次。
+
+已用「故意把坏结构放回去」验证过断言确实会拦住构建。

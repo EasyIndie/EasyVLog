@@ -301,10 +301,30 @@ rmTemplates(OUT);
 
 // 6.5 每篇文档一个真页面
 let pageCount = 0;
+const pageErrors = [];
+/*
+ * 页面结构断言：head 里只应当有一份样式表，且资源路径必须已换过 __BASE__。
+ * 起因：index.html 里曾残留一段多余的 </head> + 重复的 `<link href="assets/...">`，
+ * 根页看不出来（相对路径恰好等于绝对路径），但每个深层页都会多发一个 404 请求。
+ */
+function validatePage(html, label) {
+  const links = html.match(/<link[^>]+rel="stylesheet"[^>]*>/g) || [];
+  if (links.length !== 1) {
+    pageErrors.push(`${label}：样式表 link 有 ${links.length} 个，应为 1 个`);
+    links.forEach((l) => pageErrors.push('      ' + l.trim()));
+  }
+  if (/<link[^>]+href="assets\//.test(html) || /<script[^>]+src="assets\//.test(html)) {
+    pageErrors.push(`${label}：有未替换 __BASE__ 的相对资源路径，深层页会 404`);
+  }
+  const heads = (html.match(/<\/head>/g) || []).length;
+  if (heads !== 1) pageErrors.push(`${label}：</head> 出现 ${heads} 次，应为 1 次`);
+}
 for (const docPath of seen) {
   const file = outFile(docPath);
+  const html = makePage(docPath);
+  validatePage(html, docPath);
   mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, makePage(docPath));
+  writeFileSync(file, html);
   pageCount++;
 }
 
@@ -312,7 +332,15 @@ for (const docPath of seen) {
 const homeDoc = (SITE.today && SITE.today.path && seen.has(SITE.today.path))
   ? SITE.today.path
   : (docs.find((d) => d.path.indexOf('05-食谱库/00') === 0) || docs[0]).path;
-writeFileSync(join(OUT, 'index.html'), makePage(homeDoc));
+const homeHtml = makePage(homeDoc);
+validatePage(homeHtml, 'index.html');
+writeFileSync(join(OUT, 'index.html'), homeHtml);
+
+if (pageErrors.length) {
+  console.error('✗ 页面结构校验未通过（会多发无效请求）：');
+  pageErrors.forEach((e) => console.error('  · ' + e));
+  process.exit(1);
+}
 
 // 6.7 sitemap（P3-2：覆盖全部文档）
 const today = new Date().toISOString().slice(0, 10);
