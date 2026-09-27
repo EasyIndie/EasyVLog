@@ -81,11 +81,17 @@ EasyVLog/
 ├── data/
 │   └── backlog.json              ← 选题池（未建脚本的剧集）
 │
+├── index.html                    ← 🌐 在线站入口（GitHub Pages）
+├── site.json                     ← 自动生成的导航清单
+├── .nojekyll                     ← 让 Pages 原样提供 .md
+├── assets/                       ← 站点样式/脚本/marked
+│
 ├── scripts/
 │   ├── build-index.mjs           ← 重建分集索引
 │   ├── new-episode.mjs           ← 新建一集
 │   ├── build-recipes.mjs         ← 重建食谱索引
 │   ├── new-recipe.mjs            ← 新建食谱卡
+│   ├── build-site.mjs            ← 重建在线站导航
 │   ├── lib/frontmatter.mjs       ← front matter 解析
 │   └── look.sh                   ← glow 浏览文档
 │
@@ -109,6 +115,22 @@ EasyVLog/
 2. **开号前**：确认 `01-定位与调性.md` 里的账号名、简介、头像方向。
 3. **开拍前**：打开 `02-分集脚本/第01集-韭菜鸡蛋胡萝卜包.md` + `03-拍摄手册/周末批量拍摄.md`。
 4. **发布后**：填 `04-运营记录/发布与复盘表.md`，对照 `01-账号规划/05-数据复盘.md` 判断下一条方向。
+
+---
+
+## 在线查看（手机可看）
+
+发布后地址：**https://easyindie.github.io/easyvlog/**
+
+手机上可直接搜索、打开食谱/脚本/拍摄手册，支持打印（录制时照着做）。
+
+内容改动后更新导航并推送：
+```bash
+node scripts/build-site.mjs   # 重建 site.json 导航
+node scripts/build-recipes.mjs # 重建食谱索引
+node scripts/build-index.mjs   # 重建分集索引
+git add -A && git commit -m "内容: ..." && git push
+```
 
 ---
 

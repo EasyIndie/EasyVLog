@@ -57,7 +57,9 @@
 | `05-食谱库/00-食谱索引.md` | 食谱总表 | **自动生成，禁止手改** |
 | `05-食谱库/_模板.md` | 新食谱模板 | 手写 |
 | `data/backlog.json` | 选题池（未建脚本的剧集） | 手写 |
-| `scripts/` | 生成索引、脚手架、查看工具 | 代码 |
+| `index.html` + `assets/` | 在线站（GitHub Pages，手机可看） | 手写 |
+| `site.json` | 在线站导航清单 | **自动生成，禁止手改** |
+| `scripts/` | 生成索引、脚手架、站点、查看工具 | 代码 |
 | `.pi/prompts/` | 斜杠命令（`/new-episode` 等） | 手写 |
 | `.pi/skills/` | pi 技能，按需加载 | 手写 |
 
@@ -70,12 +72,14 @@
 | 某一集的元数据（标题/栏目/状态） | 该集 md 文件顶部的 **YAML front matter** | `00-分集索引.md` |
 | 未建脚本的选题 | `data/backlog.json` | `00-分集索引.md` 选题池 |
 | 某个食谱的元数据（名称/分类/难度） | 该食谱 md 顶部的 **YAML front matter** | `05-食谱库/00-食谱索引.md` |
+| 站点导航 | 各目录的 md 文件与 front matter | `site.json` |
 | 账号战略 | `01-账号规划/*.md` | — |
 
 **改完 front matter / backlog.json，必须重建对应索引：**
 ```bash
 node scripts/build-index.mjs      # 分集
 node scripts/build-recipes.mjs    # 食谱
+node scripts/build-site.mjs       # 在线站导航
 ```
 不要手改 `00-分集索引.md`。
 
@@ -170,6 +174,7 @@ node scripts/new-episode.mjs "标题" --series "今天做______"
 | `node scripts/new-episode.mjs "标题"` | 新建一集 |
 | `node scripts/build-recipes.mjs` | 重建食谱索引 |
 | `node scripts/new-recipe.mjs "名称"` | 新建食谱卡 |
+| `node scripts/build-site.mjs` | 重建在线站导航（`site.json`） |
 | `./scripts/look.sh` | TUI 浏览全部文档 |
 | `./scripts/look.sh 文件.md` | 渲染单个文档 |
 | `/new-recipe 名称` | （pi）新建食谱卡 |
