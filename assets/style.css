@@ -23,6 +23,16 @@
   --topbar-h: 58px;
   --sidebar-w: 300px;
   --maxw: 780px;
+
+  /* 移动端底部几何：
+     底栏高 --tabbar-h；计时圆钮以 --fab-bottom 为底、--fab-size 为直径；
+     上滑面板的底边必须落在圆钮之上，否则会把圆钮顶部切掉。
+     圆钮顶端 = --fab-bottom + --fab-size，再加 12px 间距。 */
+  --tabbar-h: 58px;
+  --fab-size: 62px;
+  --fab-bottom: 9px;
+  --panel-bottom: calc(var(--fab-bottom) + var(--fab-size) + 12px);
+
   color-scheme: light;
 }
 
@@ -392,7 +402,7 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 .tabbar {
   display: none;
   position: fixed; left: 0; right: 0; bottom: 0;
-  height: calc(58px + env(safe-area-inset-bottom));
+  height: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   backdrop-filter: saturate(1.6) blur(12px);
@@ -442,10 +452,10 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 
   #sidebar {
     top: auto; left: 10px; right: 10px;
-    bottom: calc(66px + var(--kb, 0px) + env(safe-area-inset-bottom));
+    bottom: calc(var(--panel-bottom) + var(--kb, 0px) + env(safe-area-inset-bottom));
     width: auto; height: auto;
-    max-height: calc(100vh - 190px - var(--kb, 0px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    max-height: calc(100dvh - 190px - var(--kb, 0px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(100vh - var(--panel-bottom) - var(--topbar-h) - 8px - var(--kb, 0px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(100dvh - var(--panel-bottom) - var(--topbar-h) - 8px - var(--kb, 0px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     transform: translateY(calc(100% + 80px));
     opacity: 1; pointer-events: none;
     border: 1px solid var(--line);
@@ -556,9 +566,9 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
   .timer-fab {
     display: inline-flex;
     position: fixed; z-index: 46;
-    left: 50%; right: auto; margin-left: -31px;
-    bottom: calc(9px + env(safe-area-inset-bottom));
-    width: 62px; height: 62px; padding: 0; gap: 0;
+    left: 50%; right: auto; margin-left: calc(var(--fab-size) / -2);
+    bottom: calc(var(--fab-bottom) + env(safe-area-inset-bottom));
+    width: var(--fab-size); height: var(--fab-size); padding: 0; gap: 0;
     flex-direction: column;
     border: 0; border-radius: 50%;
     background: var(--accent); color: #fff;
@@ -568,8 +578,8 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
   .timer-fab.has-timers .fab-ico { width: 15px; height: 15px; }
   .timer-fab .fab-time { font-size: 14px; }
   .timer-panel {
-    right: 10px; left: 10px; bottom: calc(66px + var(--kb, 0px) + env(safe-area-inset-bottom)); width: auto;
-    max-height: calc(100dvh - 190px - var(--kb, 0px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    right: 10px; left: 10px; bottom: calc(var(--panel-bottom) + var(--kb, 0px) + env(safe-area-inset-bottom)); width: auto;
+    max-height: calc(100dvh - var(--panel-bottom) - var(--topbar-h) - 8px - var(--kb, 0px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     border-radius: 18px; transform: translateY(calc(100% + 80px));
   }
   body.timer-open .timer-panel { transform: translateY(0); }
