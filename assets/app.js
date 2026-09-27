@@ -509,6 +509,7 @@
     }
 
     decorateSteps(content.querySelector('.md'));
+    decorateTables(content.querySelector('.md'));
   }
 
   function render(mdText, path) {
@@ -957,6 +958,22 @@
     if (last < text.length) out.push({ text: text.slice(last) });
     if (!out.some(function (p) { return p.sec; })) return null;
     return out;
+  }
+  /*
+   * 给「材料 / 用量」这类食材表打个标，CSS 才好只给用量列加重。
+   * 不按 nth-child(2) 硬写：站内还有「集号/标题」「镜号/时间」「平台/角色」
+   * 这些表，第二列并不是数值，无条件加粗会重点错。
+   */
+  function decorateTables(root) {
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('table'), function (t) {
+      var ths = t.querySelectorAll('thead th');
+      if (ths.length < 2) return;
+      var a = ths[0].textContent.trim(), b = ths[1].textContent.trim();
+      if (/^(材料|食材|原料)$/.test(a) && /^(用量|数量|分量|克数)$/.test(b)) {
+        t.classList.add('t-ing');
+      }
+    });
   }
   /* 仅在「步骤 / 做法」段落里把时长变成可点倒计时 */
   function decorateSteps(root) {

@@ -12,6 +12,10 @@
   --ink-2: #4a453e;
   --muted: #6b655c;
   --line: #e7e3db;
+  /* 表格专用：--line 对底色只有 1.17:1，做框线太淡，单开一档
+     浅色 #b8b0a0 = 1.97:1，深色 #464f58 = 2.16:1（都相对单元格实际底色 --bg） */
+  --line-strong: #b8b0a0;
+  --zebra: #ece9e1;          /* 隔行底色，1.11:1，能看出来但不抢眼 */
   --code-bg: #efece6;
 
   --radius: 14px;
@@ -22,7 +26,7 @@
   --sbw: 0px;
   --topbar-h: 58px;
   --sidebar-w: 300px;
-  --maxw: 780px;
+  --maxw: 720px;            /* 780 会让 768–959 区间变成 43 字/行；720 → 两档都进 38–40 */
 
   /* 移动端底部几何：
      底栏高 --tabbar-h；计时圆钮以 --fab-bottom 为底、--fab-size 为直径；
@@ -54,6 +58,8 @@
   --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 28px -14px rgba(0,0,0,.7);
   --scrollbar: #343c44;
   --scrollbar-hover: #48525c;
+  --line-strong: #464f58;
+  --zebra: #1e2328;
   color-scheme: dark;
 }
 
@@ -76,7 +82,8 @@ body {
     "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   font-size: 17px;
   line-height: 1.8;
-  -webkit-font-smoothing: antialiased;
+  /* 不要用 -webkit-font-smoothing: antialiased：它会把字重压细，
+     中文笔画密，压细之后小字号下辨识度明显下降。用系统默认渲染。 */
   text-rendering: optimizeLegibility;
 }
 
@@ -279,14 +286,14 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 @keyframes sk { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 .md h1 {
-  font-size: 1.6em; line-height: 1.35; margin: .2em 0 .8em;
+  font-size: 1.75em; line-height: 1.32; margin: .2em 0 .8em;
   letter-spacing: -.01em;
 }
 .md h2 {
-  font-size: 1.22em; margin: 1.9em 0 .7em; padding-bottom: .3em;
+  font-size: 1.32em; margin: 1.9em 0 .7em; padding-bottom: .3em;
   border-bottom: 1px solid var(--line);
 }
-.md h3 { font-size: 1.06em; margin: 1.5em 0 .5em; }
+.md h3 { font-size: 1.15em; font-weight: 600; margin: 1.7em 0 .55em; }
 .md p { margin: .75em 0; }
 .md a { text-underline-offset: 3px; }
 .md strong { color: var(--accent-ink); font-weight: 650; }
@@ -316,13 +323,16 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 
 .md table {
   width: 100%; border-collapse: collapse; margin: 1em 0;
-  font-size: 15px;
+  /* 食材表是“照着称重”要用的，字号不能再小于正文 */
+  font-size: 1em;
 }
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1em 0; border-radius: var(--radius-sm); }
 .table-wrap table { margin: 0; white-space: nowrap; }
-.md th, .md td { border: 1px solid var(--line); padding: 9px 13px; text-align: left; }
+.md th, .md td { border: 1px solid var(--line-strong); padding: 9px 13px; text-align: left; font-variant-numeric: tabular-nums; }
 .md th { background: var(--surface-2); font-weight: 650; }
-.md tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface-2) 60%, transparent); }
+.md tbody tr:nth-child(even) td { background: var(--zebra); }
+/* 仅“材料 / 用量”表（由 decorateTables() 打标）：用量列加重，方便纵向比数 */
+.md table.t-ing td:nth-child(2) { font-weight: 600; }
 
 .md input[type=checkbox] { width: 17px; height: 17px; vertical-align: -3px; accent-color: var(--accent); }
 .md img { max-width: 100%; border-radius: var(--radius-sm); }
@@ -450,6 +460,14 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
   }
   /* 字号变大后用内边距把原来的紧凑感拉回来 */
   #search { padding: 6px 0; }
+
+  /*
+   * 表格：字号提到和正文一致后会变宽，窄屏靠两招避免横滑——
+   * 收紧单元格内边距；末列（备注）允许换行，不再被 nowrap 撑开。
+   * 列数多的表（分集脚本 7 列）本来就要横滑，不受影响。
+   */
+  .md th, .md td { padding: 8px 10px; }
+  .md td:last-child, .md th:last-child { white-space: normal; }
 
   #sidebar {
     top: auto; left: 10px; right: 10px;
@@ -594,7 +612,11 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
 @media (min-width: 960px) {
   #sidebar { transform: none; width: var(--sidebar-w); }
   #backdrop { display: none; }
-  #content { margin-left: var(--sidebar-w); padding: 34px 44px 160px; }
+  /* 用 .layout 的 padding-left 让出侧栏，正文再在第一列之外的空间里 margin auto 居中。
+     之前是给 #content 设 margin-left，等于把左边钉死在侧栏右侧、
+     富余全被 margin-right:auto 推到右边（1440 下右空 360px）。 */
+  .layout { padding-left: var(--sidebar-w); }
+  #content { padding: 34px 44px 160px; }
   .brand-sub { max-width: none; }
   body { font-size: 16.5px; }
 }
@@ -622,6 +644,16 @@ body.nav-open, body.timer-open { overflow: hidden; }
 #nav::-webkit-scrollbar-thumb:hover, .tp-list::-webkit-scrollbar-thumb:hover,
 .table-wrap::-webkit-scrollbar-thumb:hover,
 .md pre::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+
+/* ============ 按下反馈 ============ */
+/* 触屏不会触发 hover。只写 :hover 的按钮点下去是“死”的，逐一补 :active。 */
+.tab, .group-head, .tp-presets button { transition: background .12s, color .12s, transform .06s; }
+.tab:active, #nav a:active, .group-head:active, .tp-presets button:active {
+  background: var(--accent-soft);
+}
+.tab:active { color: var(--accent-ink); }
+.dur:active { transform: scale(.96); }
+.tp-presets button:active { transform: scale(.97); }
 
 /* ============ 可访问性 / 浏览器细节 ============ */
 
