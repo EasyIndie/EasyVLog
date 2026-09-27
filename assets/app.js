@@ -14,7 +14,9 @@
 
   var SITE = null;
   var allLinks = [];
-  var titles = {}; // path -> title
+  var titles = {};
+  var groupState = {}; // 分组标题 -> 是否展开
+  var sectionsByKey = {};
 
   /* ---------- 主题 ---------- */
   function applyTheme(t) {
@@ -30,8 +32,7 @@
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
   }
   themeBtn.addEventListener('click', function () {
-    var cur = document.documentElement.getAttribute('data-theme');
-    applyTheme(cur === 'dark' ? 'light' : 'dark');
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
   });
   initTheme();
 
@@ -46,9 +47,7 @@
     if (!h) return null;
     try { return decodeURIComponent(h); } catch (e) { return h; }
   }
-  function urlFor(path) {
-    return path.split('/').map(encodeURIComponent).join('/');
-  }
+  function urlFor(path) { return path.split('/').map(encodeURIComponent).join('/'); }
   function closeNav() {
     document.body.classList.remove('nav-open');
     menuBtn.setAttribute('aria-expanded', 'false');
@@ -62,6 +61,20 @@
     if (docTitle) docTitle.textContent = titles[path] || '私人食谱库';
   }
 
+  var toastEl = null, toastTimer = null;
+  function showToast(msg, ms) {
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.className = 'toast';
+      toastEl.setAttribute('role', 'status');
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, ms || 3200);
+  }
+
   function stripFrontMatter(md) {
     if (md.slice(0, 3) === '---') {
       var m = md.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
@@ -69,19 +82,44 @@
     }
     return md;
   }
-
   function slug(s) {
-    return s.trim().toLowerCase()
-      .replace(/[^\w\u4e00-\u9fa5 -]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
+    return s.trim().toLowerCase().replace(/[^\w\u4e00-\u9fa5 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
   }
 
-  /* ---------- 导航 ---------- */
+  /* ---------- 导航（可折叠分组） ---------- */
+  function loadState() {
+    try { groupState = JSON.parse(localStorage.getItem('navGroups') || '{}') || {}; }
+    catch (e) { groupState = {}; }
+  }
+  function saveState() {
+    try { localStorage.setItem('navGroups', JSON.stringify(groupState)); } catch (e) {}
+  }
+  function defaultOpen(sec) {
+    if (sec.highlight) return true;
+    if (SITE.today && sec.items.some(function (i) { return i.path === SITE.today.path; })) return true;
+    return false;
+  }
+  function isOpen(sec) {
+    return groupState.hasOwnProperty(sec.title) ? !!groupState[sec.title] : defaultOpen(sec);
+  }
+
+  function makeLink(it) {
+    var a = document.createElement('a');
+    a.href = '#' + encodeURIComponent(it.path);
+    a.dataset.path = it.path;
+    a.dataset.search = (it.title + ' ' + it.path).toLowerCase();
+    a.textContent = it.title;
+    a.addEventListener('click', closeNav);
+    allLinks.push(a);
+    titles[it.path] = it.title;
+    return a;
+  }
+
   function buildNav() {
     nav.innerHTML = '';
     allLinks = [];
     titles = {};
+    loadState();
 
     if (SITE.today && SITE.today.path) {
       var pin = document.createElement('a');
@@ -100,22 +138,75 @@
     }
 
     SITE.sections.forEach(function (sec) {
-      var h = document.createElement('div');
-      h.className = 'sec' + (sec.highlight ? ' hl' : '');
-      h.textContent = (sec.icon ? sec.icon + '  ' : '') + sec.title;
-      nav.appendChild(h);
-      sec.items.forEach(function (it) {
-        var a = document.createElement('a');
-        a.href = '#' + encodeURIComponent(it.path);
-        a.dataset.path = it.path;
-        a.dataset.search = (it.title + ' ' + it.path).toLowerCase();
-        a.textContent = it.title;
-        a.addEventListener('click', closeNav);
-        nav.appendChild(a);
-        allLinks.push(a);
-        titles[it.path] = it.title;
+      sectionsByKey[sec.title] = sec;
+      var group = document.createElement('div');
+      group.className = 'group' + (sec.highlight ? ' hl' : '') + (isOpen(sec) ? ' open' : '');
+      group.dataset.key = sec.title;
+
+      var head = document.createElement('button');
+      head.type = 'button';
+      head.className = 'group-head';
+      head.setAttribute('aria-expanded', isOpen(sec) ? 'true' : 'false');
+      head.innerHTML =
+        '<span class="g-icon">' + escapeHtml(sec.icon || '') + '</span>' +
+        '<span class="g-name">' + escapeHtml(sec.title) + '</span>' +
+        '<span class="g-count">' + sec.items.length + '</span>' +
+        '<span class="g-chev">▸</span>';
+      head.addEventListener('click', function () {
+        var nowOpen = !group.classList.contains('open');
+        group.classList.toggle('open', nowOpen);
+        head.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
+        groupState[sec.title] = nowOpen;
+        saveState();
       });
+      group.appendChild(head);
+
+      var body = document.createElement('div');
+      body.className = 'group-body';
+      sec.items.forEach(function (it) { body.appendChild(makeLink(it)); });
+      group.appendChild(body);
+      nav.appendChild(group);
     });
+  }
+
+  function ensureGroupOpen(path) {
+    var group = null;
+    allLinks.forEach(function (a) {
+      if (a.dataset.path === path && a.parentElement && a.parentElement.classList.contains('group-body')) {
+        group = a.parentElement.parentElement;
+      }
+    });
+    if (group && !group.classList.contains('open')) {
+      group.classList.add('open');
+      var head = group.querySelector('.group-head');
+      if (head) head.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function filterNav(q) {
+    q = (q || '').trim().toLowerCase();
+    var pinEl = nav.querySelector('.pin');
+    if (!q) {
+      nav.querySelectorAll('.group').forEach(function (g) {
+        g.classList.remove('hidden');
+        var sec = sectionsByKey[g.dataset.key];
+        g.classList.toggle('open', sec ? isOpen(sec) : true);
+      });
+      nav.querySelectorAll('a').forEach(function (a) { a.classList.remove('hidden'); });
+      if (pinEl) pinEl.style.display = '';
+      return;
+    }
+    nav.querySelectorAll('.group').forEach(function (g) {
+      var any = false;
+      g.querySelectorAll('a').forEach(function (a) {
+        var hit = a.dataset.search.indexOf(q) !== -1;
+        a.classList.toggle('hidden', !hit);
+        if (hit) any = true;
+      });
+      g.classList.toggle('hidden', !any);
+      g.classList.toggle('open', any);
+    });
+    if (pinEl) pinEl.style.display = pinEl.dataset.search.indexOf(q) !== -1 ? '' : 'none';
   }
 
   /* ---------- 渲染 ---------- */
@@ -126,7 +217,6 @@
       : '<pre>' + escapeHtml(md) + '</pre>';
     content.innerHTML = '<article class="md">' + html + '</article>';
 
-    // 表格横向滚动
     content.querySelectorAll('table').forEach(function (t) {
       if (!t.parentElement.classList.contains('table-wrap')) {
         var w = document.createElement('div');
@@ -135,13 +225,8 @@
         w.appendChild(t);
       }
     });
+    content.querySelectorAll('h1,h2,h3').forEach(function (h) { if (!h.id) h.id = slug(h.textContent); });
 
-    // 标题锚点 id
-    content.querySelectorAll('h1,h2,h3').forEach(function (h) {
-      if (!h.id) h.id = slug(h.textContent);
-    });
-
-    // 拦截站内 .md 链接
     content.querySelectorAll('a[href]').forEach(function (a) {
       var href = a.getAttribute('href');
       if (!href || /^https?:|^mailto:|^#/.test(href)) return;
@@ -178,6 +263,7 @@
 
   function navigate(path) {
     setActive(path);
+    ensureGroupOpen(path);
     content.innerHTML =
       '<div class="skeleton"><div class="sk-line sk-60"></div>' +
       '<div class="sk-line sk-90"></div><div class="sk-line sk-80"></div></div>';
@@ -210,21 +296,29 @@
   toTop.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
   /* ---------- 搜索 ---------- */
-  search.addEventListener('input', function () {
-    var q = search.value.trim().toLowerCase();
-    allLinks.forEach(function (a) {
-      a.classList.toggle('hidden', !(!q || a.dataset.search.indexOf(q) !== -1));
-    });
-    var pinEl = nav.querySelector('.pin');
-    if (pinEl) pinEl.style.display = pinEl.classList.contains('hidden') ? 'none' : '';
-    nav.querySelectorAll('.sec').forEach(function (sec) {
-      var next = sec.nextElementSibling, any = false;
-      while (next && !next.classList.contains('sec')) {
-        if (next.tagName === 'A' && !next.classList.contains('hidden')) any = true;
-        next = next.nextElementSibling;
+  search.addEventListener('input', function () { filterNav(search.value); });
+
+  /* ---------- 打印 ---------- */
+  function isiOS() {
+    var ua = navigator.userAgent || '';
+    return /iPad|iPhone|iPod/.test(ua) || (ua.indexOf('Mac') !== -1 && 'ontouchend' in document);
+  }
+  printBtn.addEventListener('click', function () {
+    closeNav();
+    var article = content.querySelector('.md');
+    if (!article) { showToast('内容还没加载好，稍等一下'); return; }
+
+    if (isiOS()) {
+      showToast('iOS 无法直接弹出打印，请点浏览器「分享」→「打印」或「存储为 PDF」', 5000);
+    }
+    setTimeout(function () {
+      try {
+        if (typeof window.print === 'function') window.print();
+        else showToast('当前环境不支持打印，请用浏览器菜单里的「打印」');
+      } catch (e) {
+        showToast('打印失败，请用浏览器菜单里的「打印」');
       }
-      sec.style.display = any ? '' : 'none';
-    });
+    }, isiOS() ? 400 : 60);
   });
 
   /* ---------- 事件 ---------- */
@@ -232,13 +326,13 @@
     document.body.classList.contains('nav-open') ? closeNav() : openNav();
   });
   backdrop.addEventListener('click', closeNav);
-  printBtn.addEventListener('click', function () { window.print(); });
   window.addEventListener('hashchange', function () {
     var p = decodeHash();
     if (p && allLinks.some(function (a) { return a.dataset.path === p; })) navigate(p);
   });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeNav();
+    if (e.key === 'Escape') { closeNav(); }
+    if (e.key === '/' && document.activeElement !== search) { e.preventDefault(); openNav(); search.focus(); }
   });
 
   /* ---------- 启动 ---------- */
