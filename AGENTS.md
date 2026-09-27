@@ -60,6 +60,7 @@
 | `data/today.json` | 站点「今日要做」指向 | 手写/脚本 |
 | `index.html` + `assets/` | 在线站（GitHub Pages，手机可看） | 手写 |
 | `site.json` | 在线站导航清单 | **自动生成，禁止手改** |
+| `.github/workflows/deploy-pages.yml` | 推 main 自动重建并部署 Pages | 手写 |
 | `scripts/` | 生成索引、脚手架、站点、查看工具 | 代码 |
 | `.pi/prompts/` | 斜杠命令（`/new-episode` 等） | 手写 |
 | `.pi/skills/` | pi 技能，按需加载 | 手写 |
@@ -177,6 +178,7 @@ node scripts/new-episode.mjs "标题" --series "今天做______"
 | `node scripts/new-recipe.mjs "名称"` | 新建食谱卡 |
 | `node scripts/build-site.mjs` | 重建在线站导航（`site.json`） |
 | `node scripts/set-today.mjs "名称"` | 设置「今日要做」（置顶高亮） |
+| `git push`（main） | 触发 Actions 自动重建并部署 Pages |
 | `./scripts/look.sh` | TUI 浏览全部文档 |
 | `./scripts/look.sh 文件.md` | 渲染单个文档 |
 | `/new-recipe 名称` | （pi）新建食谱卡 |

@@ -84,6 +84,7 @@ EasyVLog/
 ├── index.html                    ← 🌐 在线站入口（GitHub Pages）
 ├── site.json                     ← 自动生成的导航清单
 ├── .nojekyll                     ← 让 Pages 原样提供 .md
+├── .github/workflows/            ← 推 main 自动构建部署 Pages
 ├── assets/                       ← 站点样式/脚本/marked
 │
 ├── scripts/
@@ -129,12 +130,17 @@ EasyVLog/
 node scripts/set-today.mjs "花卷" --note "第 02 集"
 ```
 
-内容改动后更新导航并推送：
+内容改动后：
+
 ```bash
-node scripts/build-site.mjs   # 重建 site.json 导航
-node scripts/build-recipes.mjs # 重建食谱索引
-node scripts/build-index.mjs   # 重建分集索引
 git add -A && git commit -m "内容: ..." && git push
+```
+
+推送 `main` 后，**GitHub Actions 自动重建索引与站点并部署**（`.github/workflows/deploy-pages.yml`）；无需手动构建。
+
+本地预览（可选）：
+```bash
+node scripts/build-site.mjs && python3 -m http.server 8000
 ```
 
 ---
