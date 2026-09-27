@@ -9,6 +9,7 @@
     t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
   }
   document.documentElement.setAttribute('data-theme', t);
+  // theme-color 要跟顶栏底色一致，否则系统状态栏会和顶栏分成两块
   var meta = document.querySelector('meta[name=theme-color]');
-  if (meta) meta.setAttribute('content', t === 'dark' ? '#14171a' : '#2f6f4f');
+  if (meta) meta.setAttribute('content', t === 'dark' ? '#1c2024' : '#ffffff');
 })();

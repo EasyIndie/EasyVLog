@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-09-27（状态栏衔接 + 修好上次没生效的缩放修复）
+
+- **搜索框聚焦后仍然自动放大**：上次加的 `input[type=search] { font-size:16px }` 权重是 `(0,1,1)`，
+  压不过基础样式里的 `#search { font-size: 13.5px }`（`(1,0,0)`），等于没生效。
+  现在改用 id 级选择器 + `!important` 兜底，并写明原因，避免以后再踩。
+- **状态栏与顶栏割裂**：`theme-color` 是品牌绿 `#2f6f4f`，而顶栏是白色 —— 系统状态栏取 `theme-color`，上下两块颜色对不上。
+  现在 `theme-color` 跟随顶栏底色（亮色 `#ffffff` / 暗色 `#1c2024`），manifest 的 `theme_color` 同步；
+  并给 `html` 设 `background: var(--surface)`，让安全区/回弹区也不再露出暖白底色。
+- 补 `<meta name="apple-mobile-web-app-status-bar-style" content="default">`，避免加到主屏后行为不确定。
+
+---
+
 ## 2026-09-27（底部几何修正）
 
 - **上滑面板切到计时圆钮顶部**：面板底边（66px）低于圆钮顶端（9+62=71px），把圆钮顶削掉一块。

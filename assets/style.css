@@ -65,7 +65,7 @@
 .ic-sm { width: 16px; height: 16px; }
 .ic-tab { width: 22px; height: 22px; }
 .only-desktop { display: none !important; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; touch-action: manipulation; scroll-padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 14px); }
+html { background: var(--surface); -webkit-text-size-adjust: 100%; scroll-behavior: smooth; touch-action: manipulation; scroll-padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 14px); }
 
 /* 防止移动端双击误触发缩放*/
 
@@ -438,15 +438,17 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 
   /*
    * iOS Safari 的规矩：输入框字号小于 16px 时，一获得焦点就自动放大整页，
-   * 而且往往不会自动缩回去。把移动端所有输入框抬到 16px，从根上关掉这个行为。
+   * 而且往往不会自动缩回去。
+   * 注意：必须用 id 级选择器。基础样式里的 `#search { font-size: 13.5px }`
+   * 权重是 (1,0,0)，用 `input[type=search]` (0,1,1) 是压不过它的。
    * （不要用 maximum-scale=1 去堵，那会连带禁止用户双指缩放，损害可访问性。）
    */
+  #search, #search::placeholder, #timerInput, .tp-custom input,
   input[type="search"], input[type="text"], input[type="number"],
   input[type="tel"], input[type="email"], input[type="url"],
   input[type="password"], textarea {
-    font-size: 16px;
+    font-size: 16px !important;
   }
-  #search::placeholder { font-size: 16px; }
   /* 字号变大后用内边距把原来的紧凑感拉回来 */
   #search { padding: 6px 0; }
 
