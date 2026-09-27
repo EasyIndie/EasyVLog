@@ -33,33 +33,33 @@ function listDir(dir, { order = [], exclude = [] } = {}) {
 const sections = [
   {
     title: '总览',
-    icon: '📖',
+    icon: 'info',
     items: [{ title: '项目总览', path: 'README.md' }],
   },
   {
     title: '食谱库',
-    icon: '🟢',
+    icon: 'book-open',
     highlight: true,
     items: listDir('05-食谱库', { order: ['00-食谱索引.md'] }),
   },
   {
     title: '分集脚本',
-    icon: '📝',
+    icon: 'clapperboard',
     items: listDir('02-分集脚本', { order: ['00-分集索引.md'] }),
   },
   {
     title: '拍摄手册',
-    icon: '🎬',
+    icon: 'video',
     items: listDir('03-拍摄手册'),
   },
   {
     title: '账号规划',
-    icon: '📋',
+    icon: 'clipboard-list',
     items: listDir('01-账号规划', { order: ['01-定位与调性.md'] }),
   },
   {
     title: '运营记录',
-    icon: '📊',
+    icon: 'bar-chart-3',
     items: listDir('04-运营记录'),
   },
 ].filter((s) => s.items.length > 0);

@@ -4,7 +4,7 @@
   "sections": [
     {
       "title": "总览",
-      "icon": "📖",
+      "icon": "info",
       "items": [
         {
           "title": "项目总览",
@@ -14,7 +14,7 @@
     },
     {
       "title": "食谱库",
-      "icon": "🟢",
+      "icon": "book-open",
       "highlight": true,
       "items": [
         {
@@ -33,7 +33,7 @@
     },
     {
       "title": "分集脚本",
-      "icon": "📝",
+      "icon": "clapperboard",
       "items": [
         {
           "title": "分集索引",
@@ -51,7 +51,7 @@
     },
     {
       "title": "拍摄手册",
-      "icon": "🎬",
+      "icon": "video",
       "items": [
         {
           "title": "素材银行清单",
@@ -65,7 +65,7 @@
     },
     {
       "title": "账号规划",
-      "icon": "📋",
+      "icon": "clipboard-list",
       "items": [
         {
           "title": "定位与调性",
@@ -111,7 +111,7 @@
     },
     {
       "title": "运营记录",
-      "icon": "📊",
+      "icon": "bar-chart-3",
       "items": [
         {
           "title": "发布与复盘表",

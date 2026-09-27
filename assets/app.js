@@ -8,6 +8,7 @@
   var sidebarEl = document.getElementById('sidebar');
   var tabbar = document.querySelector('.tabbar');
   var navClose = document.getElementById('navClose');
+  var sidebarToggle = document.getElementById('sidebarToggle');
   var printBtn = document.getElementById('printBtn');
   var themeBtn = document.getElementById('themeBtn');
   var backdrop = document.getElementById('backdrop');
@@ -113,10 +114,40 @@
   function closeNav() {
     document.body.classList.remove('nav-open');
     if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
+    syncScrollLock();
   }
   function openNav() {
+    if (document.body.classList.contains('timer-open')) closeTimerPanel();
     document.body.classList.add('nav-open');
     if (menuBtn) menuBtn.setAttribute('aria-expanded', 'true');
+    syncScrollLock();
+  }
+
+  /* ---------- 滚动锁定（弹层打开时锁住背景） ---------- */
+  var scrollLockY = 0, scrollLocked = false;
+  function lockScroll() {
+    if (scrollLocked) return;
+    scrollLockY = window.scrollY || document.documentElement.scrollTop || 0;
+    document.body.style.position = 'fixed';
+    document.body.style.top = (-scrollLockY) + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    scrollLocked = true;
+  }
+  function unlockScroll() {
+    if (!scrollLocked) return;
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    scrollLocked = false;
+    window.scrollTo(0, scrollLockY);
+  }
+  function syncScrollLock() {
+    var open = document.body.classList.contains('nav-open') || document.body.classList.contains('timer-open');
+    open ? lockScroll() : unlockScroll();
   }
   function setActive(path) {
     allLinks.forEach(function (a) { a.classList.toggle('active', a.dataset.path === path); });
@@ -139,6 +170,7 @@
     else location.hash = '#' + encodeURIComponent(path);
   }
 
+  var TOAST_ICONS = { timer: '#ic-timer', printer: '#ic-printer', check: '#ic-check', info: '#ic-info', theme: '#ic-sun-moon', alert: '#ic-info' };
   var toastEl = null, toastTimer = null;
   function hideToast() { if (toastEl) toastEl.classList.remove('show'); }
   function showToast(opts) {
@@ -149,13 +181,13 @@
       toastEl.className = 'toast';
       toastEl.setAttribute('role', 'status');
       toastEl.innerHTML =
-        '<span class="t-icon"></span>' +
+        '<svg class="ic t-icon" aria-hidden="true"><use href="#ic-info"/></svg>' +
         '<div class="t-body"><div class="t-title"></div><div class="t-text"></div></div>' +
-        '<button class="t-close" aria-label="关闭">×</button>';
+        '<button class="t-close" aria-label="关闭"><svg class="ic" aria-hidden="true"><use href="#ic-x"/></svg></button>';
       toastEl.querySelector('.t-close').addEventListener('click', hideToast);
       document.body.appendChild(toastEl);
     }
-    toastEl.querySelector('.t-icon').textContent = opts.icon || '💡';
+    toastEl.querySelector('.t-icon use').setAttribute('href', TOAST_ICONS[opts.icon] || '#ic-info');
     var titleEl = toastEl.querySelector('.t-title');
     titleEl.textContent = opts.title || '';
     titleEl.style.display = opts.title ? '' : 'none';
@@ -218,7 +250,7 @@
       pin.dataset.path = SITE.today.path;
       pin.dataset.search = ('今日要做 ' + SITE.today.title + ' ' + SITE.today.path).toLowerCase();
       pin.innerHTML =
-        '<span class="pin-label">🔪 今日要做</span>' +
+        '<span class="pin-label"><svg class="ic" aria-hidden="true"><use href="#ic-utensils"/></svg>今日要做</span>' +
         '<span class="pin-title">' + escapeHtml(SITE.today.title) + '</span>' +
         (SITE.today.note ? '<span class="pin-note">' + escapeHtml(SITE.today.note) + '</span>' : '');
       pin.addEventListener('click', closeNav);
@@ -238,10 +270,10 @@
       head.className = 'group-head';
       head.setAttribute('aria-expanded', isOpen(sec) ? 'true' : 'false');
       head.innerHTML =
-        '<span class="g-icon">' + escapeHtml(sec.icon || '') + '</span>' +
+        '<svg class="ic" aria-hidden="true"><use href="#ic-' + escapeHtml(sec.icon || 'info') + '"/></svg>' +
         '<span class="g-name">' + escapeHtml(sec.title) + '</span>' +
         '<span class="g-count">' + sec.items.length + '</span>' +
-        '<span class="g-chev">▸</span>';
+        '<svg class="ic g-chev" aria-hidden="true"><use href="#ic-chevron-right"/></svg>';
       head.addEventListener('click', function () {
         var nowOpen = !group.classList.contains('open');
         group.classList.toggle('open', nowOpen);
@@ -473,6 +505,21 @@
   backdrop.addEventListener('click', closeNav);
   if (navClose) navClose.addEventListener('click', closeNav);
 
+  /* 桌面：收起 / 展开侧边栏 */
+  (function () {
+    var KEY = 'sidebarCollapsed';
+    function apply(v) {
+      document.body.classList.toggle('sidebar-collapsed', v);
+      if (sidebarToggle) sidebarToggle.setAttribute('aria-pressed', v ? 'true' : 'false');
+    }
+    try { apply(localStorage.getItem(KEY) === '1'); } catch (e) {}
+    if (sidebarToggle) sidebarToggle.addEventListener('click', function () {
+      var v = !document.body.classList.contains('sidebar-collapsed');
+      apply(v);
+      try { localStorage.setItem(KEY, v ? '1' : '0'); } catch (e) {}
+    });
+  })();
+
   /* 目录滚动时才显示滚动条 */
   if (nav) {
     var navScrollTimer = null;
@@ -674,11 +721,11 @@
         '</div>' +
         '<div class="tp-ctrl">' +
           (t.done
-            ? '<button data-act="toggle" title="知道了">✓</button>'
-            : '<button data-act="toggle" title="暂停/继续">' + (t.endAt ? '⏸' : '▶') + '</button>' +
-              '<button data-act="bump" title="加 1 分钟">+1</button>') +
-          '<button data-act="reset" title="重置">↺</button>' +
-          '<button data-act="remove" title="删除">×</button>' +
+            ? '<button data-act="toggle" title="知道了"><svg class="ic" aria-hidden="true"><use href="#ic-check"/></svg></button>'
+            : '<button data-act="toggle" title="暂停/继续"><svg class="ic" aria-hidden="true"><use href="#ic-' + (t.endAt ? 'pause' : 'play') + '"/></svg></button>' +
+              '<button data-act="bump" title="加 1 分钟"><svg class="ic" aria-hidden="true"><use href="#ic-plus"/></svg></button>') +
+          '<button data-act="reset" title="重置"><svg class="ic" aria-hidden="true"><use href="#ic-rotate-ccw"/></svg></button>' +
+          '<button data-act="remove" title="删除"><svg class="ic" aria-hidden="true"><use href="#ic-trash-2"/></svg></button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -687,13 +734,16 @@
 
   function openTimerPanel() {
     if (!timerPanel) return;
+    if (document.body.classList.contains('nav-open')) closeNav();
     document.body.classList.add('timer-open');
     timerPanel.setAttribute('aria-hidden', 'false');
     renderTimers();
+    syncScrollLock();
   }
   function closeTimerPanel() {
     document.body.classList.remove('timer-open');
     if (timerPanel) timerPanel.setAttribute('aria-hidden', 'true');
+    syncScrollLock();
   }
   function syncWake() {
     if (!WAKE_SUPPORTED) return;
@@ -760,7 +810,7 @@
           btn.type = 'button';
           btn.className = 'dur';
           btn.title = '开始 ' + fmtDur(part.sec) + ' 倒计时';
-          btn.innerHTML = '<span class="dur-ico">⏱</span>' + escapeHtml(part.text.trim());
+          btn.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#ic-timer"/></svg>' + escapeHtml(part.text.trim());
           (function (sec) {
             btn.addEventListener('click', function () { addTimer(fmtDur(sec), sec); });
           })(part.sec);
