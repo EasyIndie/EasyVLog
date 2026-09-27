@@ -70,6 +70,23 @@ const data = {
   sections,
 };
 
+// 今日要做（来源：data/today.json）
+try {
+  const t = JSON.parse(readFileSync(join(root, 'data', 'today.json'), 'utf8'));
+  if (t && t.path) {
+    const all = sections.flatMap((s) => s.items);
+    const hit = all.find((i) => i.path === t.path);
+    data.today = {
+      path: t.path,
+      title: (hit && hit.title) || t.title || t.path,
+      note: t.note || '',
+    };
+  }
+} catch {
+  /* 没有 today.json 就跳过 */
+}
+
 writeFileSync(join(root, 'site.json'), JSON.stringify(data, null, 2) + '\n');
 const count = sections.reduce((n, s) => n + s.items.length, 0);
 console.log(`✅ 已生成 site.json：${sections.length} 个分区，${count} 篇文档`);
+if (data.today) console.log(`   今日要做：${data.today.title}`);

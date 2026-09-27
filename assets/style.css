@@ -103,6 +103,35 @@ body.nav-open #sidebar { transform: translateX(0); }
 #nav a.hidden { display: none; }
 #nav .empty { color: var(--muted); font-size: 14px; padding: 10px 12px; }
 
+/* 今日要做（置顶） */
+#nav .pin {
+  display: block;
+  margin: 12px 6px 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2f6f4f, #3f8a63);
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 3px 10px rgba(47, 111, 79, .28);
+}
+#nav .pin .pin-label { display: block; font-size: 12px; opacity: .9; letter-spacing: .08em; }
+#nav .pin .pin-title { display: block; font-size: 16.5px; font-weight: 700; margin-top: 2px; line-height: 1.35; }
+#nav .pin .pin-note { display: block; font-size: 12.5px; opacity: .88; margin-top: 3px; }
+#nav .pin.active { outline: 2px solid rgba(255, 255, 255, .55); }
+#nav .pin.hidden { display: none; }
+
+.today-banner {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14.5px;
+  border: 1px solid #cfe3d7;
+}
+
 .sidebar-foot { padding: 10px 14px; border-top: 1px solid var(--line); }
 .sidebar-foot .warn { font-size: 12.5px; color: var(--muted); }
 

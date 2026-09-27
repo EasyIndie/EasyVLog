@@ -57,6 +57,7 @@
 | `05-食谱库/00-食谱索引.md` | 食谱总表 | **自动生成，禁止手改** |
 | `05-食谱库/_模板.md` | 新食谱模板 | 手写 |
 | `data/backlog.json` | 选题池（未建脚本的剧集） | 手写 |
+| `data/today.json` | 站点「今日要做」指向 | 手写/脚本 |
 | `index.html` + `assets/` | 在线站（GitHub Pages，手机可看） | 手写 |
 | `site.json` | 在线站导航清单 | **自动生成，禁止手改** |
 | `scripts/` | 生成索引、脚手架、站点、查看工具 | 代码 |
@@ -175,6 +176,7 @@ node scripts/new-episode.mjs "标题" --series "今天做______"
 | `node scripts/build-recipes.mjs` | 重建食谱索引 |
 | `node scripts/new-recipe.mjs "名称"` | 新建食谱卡 |
 | `node scripts/build-site.mjs` | 重建在线站导航（`site.json`） |
+| `node scripts/set-today.mjs "名称"` | 设置「今日要做」（置顶高亮） |
 | `./scripts/look.sh` | TUI 浏览全部文档 |
 | `./scripts/look.sh 文件.md` | 渲染单个文档 |
 | `/new-recipe 名称` | （pi）新建食谱卡 |

@@ -13,6 +13,12 @@
 
   function qs(sel, el) { return (el || document).querySelector(sel); }
 
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
   function decodeHash() {
     var h = location.hash.replace(/^#/, '');
     if (!h) return null;
@@ -37,6 +43,23 @@
   function buildNav() {
     nav.innerHTML = '';
     allLinks = [];
+
+    // 置顶：今日要做
+    if (SITE.today && SITE.today.path) {
+      var pin = document.createElement('a');
+      pin.className = 'pin';
+      pin.href = '#' + encodeURIComponent(SITE.today.path);
+      pin.dataset.path = SITE.today.path;
+      pin.dataset.title = ('今日要做 ' + SITE.today.title + ' ' + SITE.today.path).toLowerCase();
+      pin.innerHTML =
+        '<span class="pin-label">🔪 今日要做</span>' +
+        '<span class="pin-title">' + escapeHtml(SITE.today.title) + '</span>' +
+        (SITE.today.note ? '<span class="pin-note">' + escapeHtml(SITE.today.note) + '</span>' : '');
+      pin.addEventListener('click', function () { closeNav(); });
+      nav.appendChild(pin);
+      allLinks.push(pin);
+    }
+
     SITE.sections.forEach(function (sec) {
       var h = document.createElement('div');
       h.className = 'sec' + (sec.highlight ? ' hl' : '');
@@ -89,6 +112,14 @@
     content.scrollTop = 0;
     window.scrollTo(0, 0);
     document.title = '毕业生食谱';
+
+    // 今日要做：内容顶部加一条提示
+    if (SITE.today && SITE.today.path === path) {
+      var banner = document.createElement('div');
+      banner.className = 'today-banner';
+      banner.textContent = '🔪 今日要做' + (SITE.today.note ? ' · ' + SITE.today.note : '');
+      content.insertBefore(banner, content.firstChild);
+    }
   }
 
   // 去掉 YAML front matter，避免渲染成正文
@@ -135,15 +166,21 @@
   function boot(data) {
     SITE = data;
     buildNav();
-    var start = decodeHash() || (function () {
-      try { return localStorage.getItem('lastDoc'); } catch (e) { return null; }
-    })() || null;
-    var exists = allLinks.some(function (a) { return a.dataset.path === start; });
-    if (!start || !exists) {
-      start = SITE.sections[0].items[0].path;
-      // 优先打开食谱索引
+    var lastDoc = null;
+    try { lastDoc = localStorage.getItem('lastDoc'); } catch (e) {}
+
+    // 优先级：地址 hash > 今日要做 > 上次看的 > 食谱库索引
+    var candidates = [decodeHash(), (SITE.today && SITE.today.path) || null, lastDoc];
+    var start = null;
+    for (var i = 0; i < candidates.length; i++) {
+      if (candidates[i] && allLinks.some(function (a) { return a.dataset.path === candidates[i]; })) {
+        start = candidates[i];
+        break;
+      }
+    }
+    if (!start) {
       var recipes = allLinks.find(function (a) { return a.dataset.path.indexOf('05-食谱库/00') === 0; });
-      if (recipes) start = recipes.dataset.path;
+      start = recipes ? recipes.dataset.path : SITE.sections[0].items[0].path;
     }
     navigate(start);
   }
@@ -157,6 +194,8 @@
       a.classList.toggle('hidden', !hit);
       if (hit) visible++;
     });
+    var pinEl = nav.querySelector('.pin');
+    if (pinEl) pinEl.style.display = (q && pinEl.classList.contains('hidden')) ? 'none' : '';
     nav.querySelectorAll('.sec').forEach(function (sec) {
       var next = sec.nextElementSibling, any = false;
       while (next && !next.classList.contains('sec')) {

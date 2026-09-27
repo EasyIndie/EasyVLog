@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-09-27（在线站：「今日要做」）
+
+- 站点新增**「今日要做」**：侧栏置顶高亮、默认直达、内容顶部提示。
+- 新增 `data/today.json`（单一来源）+ `scripts/set-today.mjs`（一条命令切换）。
+- `build-site.mjs` 读取 today 并写入 `site.json`。
+
+---
+
 ## 2026-09-27（在线站 / GitHub Pages）
 
 - 新增零构建静态站：`index.html` + `assets/`（marked 本地内置，不依赖 CDN）+ `.nojekyll`。
