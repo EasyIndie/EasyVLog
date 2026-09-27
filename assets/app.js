@@ -47,6 +47,9 @@
     if (!h) return null;
     try { return decodeURIComponent(h); } catch (e) { return h; }
   }
+  function safeDecode(s) {
+    try { return decodeURIComponent(s); } catch (e) { return s; }
+  }
   function urlFor(path) { return path.split('/').map(encodeURIComponent).join('/'); }
   function closeNav() {
     document.body.classList.remove('nav-open');
@@ -62,17 +65,29 @@
   }
 
   var toastEl = null, toastTimer = null;
-  function showToast(msg, ms) {
+  function hideToast() { if (toastEl) toastEl.classList.remove('show'); }
+  function showToast(opts) {
+    if (typeof opts === 'string') opts = { text: opts };
+    opts = opts || {};
     if (!toastEl) {
       toastEl = document.createElement('div');
       toastEl.className = 'toast';
       toastEl.setAttribute('role', 'status');
+      toastEl.innerHTML =
+        '<span class="t-icon"></span>' +
+        '<div class="t-body"><div class="t-title"></div><div class="t-text"></div></div>' +
+        '<button class="t-close" aria-label="关闭">×</button>';
+      toastEl.querySelector('.t-close').addEventListener('click', hideToast);
       document.body.appendChild(toastEl);
     }
-    toastEl.textContent = msg;
+    toastEl.querySelector('.t-icon').textContent = opts.icon || '💡';
+    var titleEl = toastEl.querySelector('.t-title');
+    titleEl.textContent = opts.title || '';
+    titleEl.style.display = opts.title ? '' : 'none';
+    toastEl.querySelector('.t-text').textContent = opts.text || '';
     toastEl.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, ms || 3200);
+    toastTimer = setTimeout(hideToast, opts.ms || 4200);
   }
 
   function stripFrontMatter(md) {
@@ -229,11 +244,14 @@
 
     content.querySelectorAll('a[href]').forEach(function (a) {
       var href = a.getAttribute('href');
-      if (!href || /^https?:|^mailto:|^#/.test(href)) return;
-      if (!/\.md($|#)/.test(href)) return;
+      if (!href || /^(https?:|mailto:|tel:)/.test(href)) return;
+      if (href.charAt(0) === '#') return; // 同页锚点，交给浏览器
+      if (!/\.md($|[?#])/.test(href)) return; // 只接管站内 md 链接
       a.addEventListener('click', function (ev) {
         ev.preventDefault();
-        var target = resolve(href, path);
+        // marked 会把中文链接百分号编码，先解码再解析
+        var decoded = safeDecode(href.split('#')[0].split('?')[0]);
+        var target = resolve(decoded, path);
         if (target) location.hash = '#' + encodeURIComponent(target);
       });
     });
@@ -306,17 +324,22 @@
   printBtn.addEventListener('click', function () {
     closeNav();
     var article = content.querySelector('.md');
-    if (!article) { showToast('内容还没加载好，稍等一下'); return; }
+    if (!article) { showToast({ icon: '⏳', title: '稍等', text: '内容还没加载好' }); return; }
 
     if (isiOS()) {
-      showToast('iOS 无法直接弹出打印，请点浏览器「分享」→「打印」或「存储为 PDF」', 5000);
+      showToast({
+        icon: '🖨️',
+        title: 'iOS 打印提示',
+        text: '请点浏览器「分享」→「打印」或「存储为 PDF」',
+        ms: 6500,
+      });
     }
     setTimeout(function () {
       try {
         if (typeof window.print === 'function') window.print();
-        else showToast('当前环境不支持打印，请用浏览器菜单里的「打印」');
+        else showToast({ icon: '🖨️', title: '无法打印', text: '请用浏览器菜单里的「打印」' });
       } catch (e) {
-        showToast('打印失败，请用浏览器菜单里的「打印」');
+        showToast({ icon: '🖨️', title: '打印失败', text: '请用浏览器菜单里的「打印」' });
       }
     }, isiOS() ? 400 : 60);
   });
@@ -328,7 +351,7 @@
   backdrop.addEventListener('click', closeNav);
   window.addEventListener('hashchange', function () {
     var p = decodeHash();
-    if (p && allLinks.some(function (a) { return a.dataset.path === p; })) navigate(p);
+    if (p && /\.md$/.test(p)) navigate(p);
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { closeNav(); }
