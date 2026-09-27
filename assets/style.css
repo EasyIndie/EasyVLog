@@ -517,7 +517,7 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
     bottom: calc(9px + env(safe-area-inset-bottom));
     width: 62px; height: 62px; padding: 0; gap: 0;
     flex-direction: column;
-    border: 0;
+    border: 0; border-radius: 50%;
     background: var(--accent); color: #fff;
     box-shadow: 0 -2px 8px -4px rgba(0, 0, 0, .3), 0 8px 20px -12px rgba(0, 0, 0, .5);
   }
