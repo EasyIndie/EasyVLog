@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+._*
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+
+# Node
+node_modules/
+npm-debug.log*
+
+# 临时文件
+*.bak
+*.tmp
+.tmp/
+
+# ===== 大文件 / 原始素材不进版本库 =====
+# 视频、音频、图片原始素材
+*.mp4
+*.mov
+*.MP4
+*.MOV
+*.avi
+*.mkv
+*.wav
+*.aiff
+*.psd
+*.ai
+*.aep
+*.prproj
+*.drp
+
+# 素材目录（按需保留，默认忽略）
+素材银行/
+素材/
+raw/
