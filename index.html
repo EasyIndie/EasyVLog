@@ -74,6 +74,33 @@
     </button>
   </nav>
 
+  <button id="timerFab" class="timer-fab" type="button" aria-label="计时器">
+    <span class="fab-ico" aria-hidden="true">⏱</span>
+    <span id="timerFabTime" class="fab-time"></span>
+  </button>
+  <div id="timerBackdrop" class="timer-backdrop"></div>
+  <section id="timerPanel" class="timer-panel" aria-label="计时器" aria-hidden="true">
+    <div class="tp-head">
+      <span class="tp-title">计时器</span>
+      <button id="timerClose" class="tp-close" type="button" aria-label="关闭">×</button>
+    </div>
+    <div id="timerList" class="tp-list"></div>
+    <div class="tp-add">
+      <div class="tp-presets">
+        <button type="button" data-min="1">1 分</button>
+        <button type="button" data-min="3">3 分</button>
+        <button type="button" data-min="5">5 分</button>
+        <button type="button" data-min="10">10 分</button>
+        <button type="button" data-min="15">15 分</button>
+        <button type="button" data-min="30">30 分</button>
+      </div>
+      <div class="tp-custom">
+        <input id="timerInput" type="number" inputmode="numeric" min="1" max="600" placeholder="自定义（分钟）">
+        <button id="timerAddBtn" type="button">添加</button>
+      </div>
+    </div>
+  </section>
+
   <button id="toTop" class="to-top" aria-label="回到顶部" title="回到顶部">↑</button>
 
   <script src="assets/marked.min.js"></script>

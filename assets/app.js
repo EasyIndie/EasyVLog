@@ -87,7 +87,7 @@
       if (document.visibilityState === 'visible' && wakeWanted && !wakeLock) acquireWake(false);
     });
     // 首次交互时补一次（请求 Wake Lock 常需要用户手势）
-    var retry = function () { if (wakeWanted && !wakeLock) acquireWake(false); };
+    var retry = function () { if (wakeWanted && !wakeLock) acquireWake(false); else if (typeof syncWake === 'function') syncWake(); };
     document.addEventListener('pointerdown', retry, { passive: true });
     document.addEventListener('keydown', retry);
 
@@ -337,6 +337,8 @@
       content.insertBefore(b, content.firstChild);
     }
 
+    decorateDurations(content.querySelector('.md'));
+
     window.scrollTo(0, 0);
     updateProgress();
   }
@@ -473,6 +475,293 @@
     if (e.key === 'Escape') { closeNav(); }
     if (e.key === '/' && document.activeElement !== search) { e.preventDefault(); openNav(); search.focus(); }
   });
+
+  /* ---------- 计时器 ---------- */
+  var timers = [];
+  var timerTick = null;
+  var wakeByTimer = false;
+  var audioCtx = null;
+  var timerFab = document.getElementById('timerFab');
+  var timerFabTime = document.getElementById('timerFabTime');
+  var timerPanel = document.getElementById('timerPanel');
+  var timerBackdrop = document.getElementById('timerBackdrop');
+  var timerList = document.getElementById('timerList');
+  var timerClose = document.getElementById('timerClose');
+  var timerAddBtn = document.getElementById('timerAddBtn');
+  var timerInput = document.getElementById('timerInput');
+
+  function nowMs() { return Date.now(); }
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function fmtClock(ms) {
+    var s = Math.max(0, Math.round(ms / 1000));
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), ss = s % 60;
+    return h > 0 ? h + ':' + pad2(m) + ':' + pad2(ss) : pad2(m) + ':' + pad2(ss);
+  }
+  function fmtDur(sec) {
+    if (sec >= 3600 && sec % 3600 === 0) return (sec / 3600) + ' 小时';
+    if (sec >= 60 && sec % 60 === 0) return (sec / 60) + ' 分钟';
+    if (sec >= 60) return Math.floor(sec / 60) + ' 分 ' + (sec % 60) + ' 秒';
+    return sec + ' 秒';
+  }
+  function remainOf(t) {
+    if (t.done) return 0;
+    if (t.endAt) return Math.max(0, t.endAt - nowMs());
+    return Math.max(0, t.remaining);
+  }
+
+  function saveTimers() {
+    try {
+      localStorage.setItem('timers', JSON.stringify(timers.map(function (t) {
+        return { id: t.id, label: t.label, duration: t.duration, endAt: t.endAt, remaining: remainOf(t), done: t.done };
+      })));
+    } catch (e) {}
+  }
+  function loadTimers() {
+    try {
+      var arr = JSON.parse(localStorage.getItem('timers') || '[]');
+      if (Array.isArray(arr)) {
+        timers = arr.filter(Boolean).map(function (t) {
+          return { id: t.id, label: t.label || '计时', duration: t.duration || 0,
+            endAt: t.endAt || null, remaining: t.remaining || 0, done: !!t.done, alerted: true };
+        });
+      }
+    } catch (e) { timers = []; }
+  }
+
+  function ensureAudio() {
+    if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { audioCtx = null; } }
+    if (audioCtx && audioCtx.state === 'suspended') { try { audioCtx.resume(); } catch (e) {} }
+  }
+  function beep(times) {
+    ensureAudio();
+    if (!audioCtx) return;
+    var t0 = audioCtx.currentTime;
+    for (var i = 0; i < times; i++) {
+      var osc = audioCtx.createOscillator(), g = audioCtx.createGain();
+      osc.type = 'sine'; osc.frequency.value = 880;
+      var s = t0 + i * 0.5;
+      g.gain.setValueAtTime(0.0001, s);
+      g.gain.exponentialRampToValueAtTime(0.28, s + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, s + 0.34);
+      osc.connect(g); g.connect(audioCtx.destination);
+      osc.start(s); osc.stop(s + 0.38);
+    }
+  }
+  function fireAlarm(t) {
+    beep(3);
+    if (navigator.vibrate) { try { navigator.vibrate([250, 120, 250, 120, 250]); } catch (e) {} }
+    showToast({ icon: '⏰', title: '时间到', text: t.label, ms: 9000 });
+    if (timerFab) {
+      timerFab.classList.add('ringing');
+      setTimeout(function () { timerFab.classList.remove('ringing'); }, 9000);
+    }
+  }
+
+  function findTimer(id) { for (var i = 0; i < timers.length; i++) if (timers[i].id === id) return timers[i]; return null; }
+
+  function addTimer(label, sec) {
+    sec = Math.round(sec);
+    if (!(sec > 0)) return;
+    timers.push({ id: 't' + nowMs() + Math.random().toString(36).slice(2, 6),
+      label: label || fmtDur(sec), duration: sec * 1000,
+      endAt: nowMs() + sec * 1000, remaining: sec * 1000, done: false, alerted: false });
+    ensureAudio();
+    startTick(); renderTimers(); syncWake(); saveTimers();
+    showToast({ icon: '⏱', title: '开始计时', text: (label ? label + ' · ' : '') + fmtDur(sec) });
+  }
+  function toggleTimer(id) {
+    var t = findTimer(id); if (!t) return;
+    if (t.done) { removeTimer(id); return; }
+    if (t.endAt) { t.remaining = remainOf(t); t.endAt = null; }
+    else { t.endAt = nowMs() + t.remaining; }
+    startTick(); renderTimers(); syncWake(); saveTimers();
+  }
+  function bumpTimer(id, sec) {
+    var t = findTimer(id); if (!t || t.done) return;
+    if (t.endAt) t.endAt += sec * 1000; else t.remaining += sec * 1000;
+    renderTimers(); saveTimers();
+  }
+  function resetTimer(id) {
+    var t = findTimer(id); if (!t) return;
+    t.done = false; t.alerted = false; t.remaining = t.duration;
+    t.endAt = t.duration > 0 ? nowMs() + t.duration : null;
+    startTick(); renderTimers(); syncWake(); saveTimers();
+  }
+  function removeTimer(id) {
+    timers = timers.filter(function (t) { return t.id !== id; });
+    renderTimers(); syncWake(); saveTimers();
+    if (!timers.some(function (t) { return t.endAt && !t.done; })) stopTick();
+  }
+  function startTick() { if (!timerTick) timerTick = setInterval(tick, 250); }
+  function stopTick() { if (timerTick) { clearInterval(timerTick); timerTick = null; } }
+
+  function tick() {
+    var structural = false;
+    timers.forEach(function (t) {
+      if (t.done || !t.endAt) return;
+      if (t.endAt - nowMs() <= 0) {
+        t.endAt = null; t.remaining = 0; t.done = true;
+        if (!t.alerted) { t.alerted = true; fireAlarm(t); }
+        structural = true;
+      }
+    });
+    if (structural) {
+      renderTimers(); saveTimers(); syncWake();
+      if (!timers.some(function (t) { return t.endAt && !t.done; })) stopTick();
+    } else {
+      updateTimes();
+    }
+    updateFab();
+  }
+  function updateTimes() {
+    if (!timerList) return;
+    timers.forEach(function (t) {
+      var el = timerList.querySelector('.tp-item[data-id="' + t.id + '"] .tp-time');
+      if (el) el.textContent = t.done ? '完成' : fmtClock(remainOf(t));
+    });
+  }
+  function updateFab() {
+    if (!timerFab) return;
+    var active = timers.filter(function (t) { return !t.done; });
+    if (active.length) {
+      timerFab.classList.add('has-timers');
+      timerFabTime.textContent = fmtClock(Math.min.apply(null, active.map(remainOf)));
+    } else {
+      timerFab.classList.remove('has-timers');
+      timerFabTime.textContent = '';
+    }
+  }
+  function renderTimers() {
+    if (!timerList) return;
+    if (!timers.length) {
+      timerList.innerHTML = '<div class="tp-empty">点食谱里的「⏱ 12 分钟」即可开始，<br>或用下面的快捷添加。</div>';
+      updateFab(); return;
+    }
+    timerList.innerHTML = timers.map(function (t) {
+      return '<div class="tp-item' + (t.done ? ' done' : '') + '" data-id="' + t.id + '">' +
+        '<div class="tp-info">' +
+          '<div class="tp-label">' + escapeHtml(t.label) + '</div>' +
+          '<div class="tp-time">' + (t.done ? '完成' : fmtClock(remainOf(t))) + '</div>' +
+        '</div>' +
+        '<div class="tp-ctrl">' +
+          (t.done
+            ? '<button data-act="toggle" title="知道了">✓</button>'
+            : '<button data-act="toggle" title="暂停/继续">' + (t.endAt ? '⏸' : '▶') + '</button>' +
+              '<button data-act="bump" title="加 1 分钟">+1</button>') +
+          '<button data-act="reset" title="重置">↺</button>' +
+          '<button data-act="remove" title="删除">×</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    updateFab();
+  }
+
+  function openTimerPanel() {
+    if (!timerPanel) return;
+    document.body.classList.add('timer-open');
+    timerPanel.setAttribute('aria-hidden', 'false');
+    renderTimers();
+  }
+  function closeTimerPanel() {
+    document.body.classList.remove('timer-open');
+    if (timerPanel) timerPanel.setAttribute('aria-hidden', 'true');
+  }
+  function syncWake() {
+    if (!WAKE_SUPPORTED) return;
+    var need = timers.some(function (t) { return t.endAt && !t.done; });
+    if (need && !wakeLock) { wakeByTimer = true; acquireWake(false); }
+    else if (!need && wakeLock && wakeByTimer && !wakeWanted) { wakeByTimer = false; releaseWake(); }
+  }
+
+  /* 把正文里的时长变成可点的倒计时芯片 */
+  var DUR_RE = /(半\s*小时)|(\d+(?:\.\d+)?)(?:\s*[-–—~～至到]\s*(\d+(?:\.\d+)?))?\s*(分钟|小时|秒)/g;
+  function splitDurations(text) {
+    var out = [], last = 0, m;
+    DUR_RE.lastIndex = 0;
+    while ((m = DUR_RE.exec(text)) !== null) {
+      if (m.index > last) out.push({ text: text.slice(last, m.index) });
+      var sec;
+      if (m[1]) sec = 1800;
+      else {
+        var unit = m[4];
+        sec = Math.round(parseFloat(m[2]) * (unit === '小时' ? 3600 : unit === '分钟' ? 60 : 1));
+      }
+      if (sec >= 5) out.push({ text: m[0], sec: sec });
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) out.push({ text: text.slice(last) });
+    if (!out.some(function (p) { return p.sec; })) return null;
+    return out;
+  }
+  function decorateDurations(root) {
+    if (!root || !window.NodeFilter) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) {
+        var v = node.nodeValue;
+        if (!v || v.length > 80 || !/分钟|小时|秒/.test(v)) return NodeFilter.FILTER_REJECT;
+        var p = node.parentElement;
+        if (!p || /^(CODE|PRE|A|BUTTON|SCRIPT|STYLE|TD|TH)$/.test(p.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = walker.nextNode())) nodes.push(n);
+    nodes.forEach(function (node) {
+      var parts = splitDurations(node.nodeValue);
+      if (!parts) return;
+      var frag = document.createDocumentFragment();
+      parts.forEach(function (part) {
+        if (part.sec) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'dur';
+          btn.title = '开始 ' + fmtDur(part.sec) + ' 倒计时';
+          btn.innerHTML = '<span class="dur-ico">⏱</span>' + escapeHtml(part.text.trim());
+          (function (sec) {
+            btn.addEventListener('click', function () { addTimer(fmtDur(sec), sec); });
+          })(part.sec);
+          frag.appendChild(btn);
+        } else {
+          frag.appendChild(document.createTextNode(part.text));
+        }
+      });
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
+  /* 计时器事件 */
+  if (timerFab) timerFab.addEventListener('click', function () {
+    document.body.classList.contains('timer-open') ? closeTimerPanel() : openTimerPanel();
+  });
+  if (timerClose) timerClose.addEventListener('click', closeTimerPanel);
+  if (timerBackdrop) timerBackdrop.addEventListener('click', closeTimerPanel);
+  if (timerList) timerList.addEventListener('click', function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest('button[data-act]') : null;
+    if (!btn) return;
+    var item = btn.closest('.tp-item'); if (!item) return;
+    var id = item.dataset.id, act = btn.dataset.act;
+    if (act === 'toggle') toggleTimer(id);
+    else if (act === 'bump') bumpTimer(id, 60);
+    else if (act === 'reset') resetTimer(id);
+    else if (act === 'remove') removeTimer(id);
+  });
+  if (timerPanel) timerPanel.addEventListener('click', function (e) {
+    var p = e.target && e.target.closest ? e.target.closest('.tp-presets button') : null;
+    if (p) addTimer(fmtDur(+p.dataset.min * 60), +p.dataset.min * 60);
+  });
+  if (timerAddBtn) timerAddBtn.addEventListener('click', function () {
+    var v = parseInt(timerInput && timerInput.value, 10);
+    if (!(v > 0)) { showToast({ icon: '⏱', title: '请输入分钟数' }); return; }
+    addTimer(v + ' 分钟', v * 60);
+    if (timerInput) timerInput.value = '';
+  });
+  if (timerInput) timerInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); if (timerAddBtn) timerAddBtn.click(); }
+  });
+
+  loadTimers();
+  if (timers.some(function (t) { return t.endAt && !t.done; })) startTick();
+  renderTimers();
 
   /* ---------- 启动 ---------- */
   function boot(data) {
