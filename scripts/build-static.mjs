@@ -127,7 +127,16 @@ function renderMarkdown(mdText, docPath) {
   let out = html;
 
   // 表格包一层，移动端才敢横向滚
-  out = out.replace(/<table>[\s\S]*?<\/table>/g, (m) => `<div class="table-wrap"><div class="table-x">${m}</div></div>`);
+  /*
+   * 表格外面套两层：.table-wrap 负责定位 + 右缘渐隐，.table-x 负责横向滚动。
+   * 顺手给「材料/用量」表打 t-ing 标——窄屏要把它改成「一行一块」的堆叠布局，
+   * 在构建期打标才不会在 JS 接管前闪一下。判据和 assets/app.js 的 decorateTables() 一致。
+   */
+  out = out.replace(/<table>([\s\S]*?)<\/table>/g, (m, inner) => {
+    const th = [...inner.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map((x) => x[1].replace(/<[^>]*>/g, '').trim());
+    const ing = th.length >= 2 && /^(材料|食材|原料)$/.test(th[0]) && /^(用量|数量|分量|克数)$/.test(th[1]);
+    return `<div class="table-wrap"><div class="table-x"><table${ing ? ' class="t-ing"' : ''}>${inner}</table></div></div>`;
+  });
 
   // 标题加 id，和 app.js 的 slug() 保持一致
   out = out.replace(/<(h[1-4])>([\s\S]*?)<\/\1>/g, (m, tag, inner) => {

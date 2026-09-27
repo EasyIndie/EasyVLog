@@ -28,7 +28,7 @@
   --sbw: 0px;
   --topbar-h: 58px;
   --sidebar-w: 300px;
-  --maxw: 720px;            /* 780 会让 768–959 区间变成 43 字/行；720 → 两档都进 38–40 */
+  --maxw: clamp(720px, 60vw, 880px);   /* 太窄两边发空，太宽又不好读；跟着视口长但封顶 880 */
 
   /* 移动端底部几何：
      底栏高 --tabbar-h；计时圆钮以 --fab-bottom 为底、--fab-size 为直径；
@@ -329,8 +329,13 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
   /* 食材表是“照着称重”要用的，字号不能再小于正文 */
   font-size: 1em;
 }
-.table-wrap { position: relative; margin: 1em 0; border-radius: var(--radius-sm); overflow: hidden; }
-.table-x { overflow-x: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+/*
+ * 表格容器只负责定位（给右缘渐隐用）。
+ * 不要给它 border-radius + overflow:hidden：表格自身的方角边框会被圆角切掉，
+ * 四个角看上去像被剃了一块。表格就该是方的。
+ */
+.table-wrap { position: relative; margin: 1em 0; }
+.table-x { overflow-x: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
 .table-wrap table { margin: 0; white-space: nowrap; }
 /*
  * 右缘渐隐：只在「能横滑」且「还没滑到底」时出现，暗示右边还有列。
@@ -344,7 +349,7 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 }
 .table-wrap.scrollable::after { opacity: 1; }
 .table-wrap.scrollable.at-end::after { opacity: 0; }
-.md th, .md td { border: 1px solid var(--line-strong); padding: 9px 13px; text-align: left; font-variant-numeric: tabular-nums; }
+.md th, .md td { border: 1px solid var(--line-strong); padding: 9px 13px; text-align: left; vertical-align: top; font-variant-numeric: tabular-nums; }
 .md th { background: var(--surface-2); font-weight: 650; }
 .md tbody tr:nth-child(even) td { background: var(--zebra); }
 /* 仅“材料 / 用量”表（由 decorateTables() 打标）：用量列加重，方便纵向比数 */
@@ -515,6 +520,41 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
   .md th, .md td { padding: 8px 10px; }
   .md td:last-child, .md th:last-child { white-space: normal; }
 
+  /*
+   * 食材表在窄屏改成「一行一块」：材料 + 用量同一行，备注换到下一行的小字。
+   * 直接让备注列换行的话，一行变两三行，会把不需要换行的材料/用量单元格
+   * 一起撑高（文字还垂直居中），整张表又高又乱。
+   * 只作用于 t-ing（材料/用量表）；7 列的分集脚本表保持真表格 + 横滑。
+   */
+  .md table.t-ing,
+  .md table.t-ing tbody,
+  .md table.t-ing tr,
+  .md table.t-ing td { display: block; width: auto; }
+
+  /* 表头只留给读屏，不占视觉空间 */
+  .md table.t-ing thead {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+  }
+
+  .md table.t-ing tr {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px;
+    padding: 9px 12px; border-bottom: 1px solid var(--line-strong);
+  }
+  .md table.t-ing tr:last-child { border-bottom: 0; }
+  /* 隔行底色改到行上：td 已经变成块了，背景得画在整个行上 */
+  .md table.t-ing tr:nth-child(even) { background: var(--zebra); }
+  .md table.t-ing tr:nth-child(even) td { background: transparent; }
+
+  .md table.t-ing td { border: 0; padding: 0; }
+  .md table.t-ing td:nth-child(1) { font-weight: 600; white-space: nowrap; }
+  .md table.t-ing td:nth-child(2) { margin-left: auto; white-space: nowrap; }
+  .md table.t-ing td:nth-child(3) {
+    flex-basis: 100%; white-space: normal;
+    color: var(--muted); font-size: .92em; line-height: 1.55;
+  }
+  .md table.t-ing td:nth-child(3):empty { display: none; }
+
   #sidebar {
     top: auto; left: 10px; right: 10px;
     bottom: calc(var(--panel-bottom) + var(--kb, 0px) + env(safe-area-inset-bottom));
@@ -665,7 +705,7 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
      之前是给 #content 设 margin-left，等于把左边钉死在侧栏右侧、
      富余全被 margin-right:auto 推到右边（1440 下右空 360px）。 */
   .layout { padding-left: var(--sidebar-w); }
-  #content { padding: 34px 44px 160px; }
+  #content { padding: 34px 40px 160px; }
   .brand-sub { max-width: none; }
   body { font-size: 16.5px; }
 }
@@ -673,7 +713,13 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
 /* ============ 滚动锁定 / 防穿透 ============ */
 body.nav-open, body.timer-open { overflow: hidden; }
 #backdrop, .timer-backdrop { touch-action: none; }
-#nav, .tp-list, .table-x, .md pre { overscroll-behavior: contain; }
+#nav, .tp-list { overscroll-behavior: contain; }
+/*
+ * 只锁横向。写成 overscroll-behavior: contain 会把纵向滚动链一起掉：
+ * overflow-x:auto 会让 overflow-y 也计算成 auto，元素就成了“纵向没东西可滚”的滚动容器，
+ * 再叠上 contain，鼠标停在表格/代码块上时页面就上下滚不动了。
+ */
+.table-x, .md pre { overscroll-behavior-x: contain; }
 
 /* ============ 滚动条（细、自动隐藏、跟随主题） ============ */
 #nav::-webkit-scrollbar, .tp-list::-webkit-scrollbar,
