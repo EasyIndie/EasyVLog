@@ -337,7 +337,7 @@
       content.insertBefore(b, content.firstChild);
     }
 
-    decorateDurations(content.querySelector('.md'));
+    decorateSteps(content.querySelector('.md'));
 
     window.scrollTo(0, 0);
     updateProgress();
@@ -704,6 +704,21 @@
     if (last < text.length) out.push({ text: text.slice(last) });
     if (!out.some(function (p) { return p.sec; })) return null;
     return out;
+  }
+  /* 仅在「步骤 / 做法」段落里把时长变成可点倒计时 */
+  function decorateSteps(root) {
+    if (!root) return;
+    var hs = root.querySelectorAll('h1,h2,h3,h4');
+    Array.prototype.forEach.call(hs, function (h) {
+      if (!/步骤|做法|操作|流程/.test(h.textContent)) return;
+      var level = h.tagName;
+      var node = h.nextElementSibling;
+      while (node) {
+        if (/^H[1-4]$/.test(node.tagName) && node.tagName <= level) break;
+        decorateDurations(node);
+        node = node.nextElementSibling;
+      }
+    });
   }
   function decorateDurations(root) {
     if (!root || !window.NodeFilter) return;
