@@ -64,7 +64,6 @@
 .ic { width: 20px; height: 20px; display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .ic-sm { width: 16px; height: 16px; }
 .ic-tab { width: 22px; height: 22px; }
-.only-desktop { display: none !important; }
 html { background: var(--surface); -webkit-text-size-adjust: 100%; scroll-behavior: smooth; touch-action: manipulation; scroll-padding-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 14px); }
 
 /* 防止移动端双击误触发缩放*/
@@ -591,14 +590,11 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
   .tp-head { justify-content: center; }
 }
 
-/* ============ 桌面端：左侧栏 ============ */
+/* ============ 桌面端：左侧栏（常驻，不可收起）============ */
 @media (min-width: 960px) {
-  .only-desktop { display: grid !important; }
   #sidebar { transform: none; width: var(--sidebar-w); }
-  body.sidebar-collapsed #sidebar { transform: translateX(-104%); }
   #backdrop { display: none; }
-  #content { margin-left: var(--sidebar-w); padding: 34px 44px 160px; transition: margin-left .24s cubic-bezier(.4,0,.2,1); }
-  body.sidebar-collapsed #content { margin-left: 0; }
+  #content { margin-left: var(--sidebar-w); padding: 34px 44px 160px; }
   .brand-sub { max-width: none; }
   body { font-size: 16.5px; }
 }

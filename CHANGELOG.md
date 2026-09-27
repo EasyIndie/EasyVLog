@@ -6,6 +6,16 @@
 
 ---
 
+## 2026-09-27（桌面端：去掉目录区收起功能）
+
+- 去掉顶栏右侧的「收起/展开目录」按钮及全部相关逻辑：收起后正文右侧会空出一大块，
+  不如让目录区常驻 —— 页面左右更均衡。
+- 连带清理：`#sidebarToggle` 按钮与 `ic-panel-left` 图标、`.only-desktop` 工具类、
+  `sidebar-collapsed` 样式与 `margin-left` 过渡（动画已无对象）、`sidebarCollapsed` 历史状态键。
+- 桌面端 `#sidebar` 现在固定 `transform: none; width: var(--sidebar-w)`，不再有位移分支。
+
+---
+
 ## 2026-09-27（状态栏衔接 + 修好上次没生效的缩放修复）
 
 - **搜索框聚焦后仍然自动放大**：上次加的 `input[type=search] { font-size:16px }` 权重是 `(0,1,1)`，

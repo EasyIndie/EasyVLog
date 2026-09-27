@@ -7,7 +7,6 @@
   var menuBtn = document.getElementById('menuBtn');
   var sidebarEl = document.getElementById('sidebar');
   var tabbar = document.querySelector('.tabbar');
-  var sidebarToggle = document.getElementById('sidebarToggle');
   var printBtn = document.getElementById('printBtn');
   var themeBtn = document.getElementById('themeBtn');
   var backdrop = document.getElementById('backdrop');
@@ -704,20 +703,8 @@
 
   backdrop.addEventListener('click', closeNav);
 
-  /* 桌面：收起 / 展开侧边栏 */
-  (function () {
-    var KEY = 'sidebarCollapsed';
-    function apply(v) {
-      document.body.classList.toggle('sidebar-collapsed', v);
-      if (sidebarToggle) sidebarToggle.setAttribute('aria-pressed', v ? 'true' : 'false');
-    }
-    try { apply(localStorage.getItem(KEY) === '1'); } catch (e) {}
-    if (sidebarToggle) sidebarToggle.addEventListener('click', function () {
-      var v = !document.body.classList.contains('sidebar-collapsed');
-      apply(v);
-      try { localStorage.setItem(KEY, v ? '1' : '0'); } catch (e) {}
-    });
-  })();
+  /* 桌面端目录区固定常驻，不再支持收起；清掉历史遗留的状态键 */
+  try { localStorage.removeItem('sidebarCollapsed'); } catch (e) {}
 
   /* 目录滚动时才显示滚动条 */
   if (nav) {
