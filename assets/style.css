@@ -416,21 +416,20 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
   .sheet-close { display: grid; place-items: center; }
 
   #sidebar {
-    top: 50%; bottom: auto; left: 10px; right: 10px;
-    width: auto; height: auto;
-    max-height: calc(100vh - 136px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    max-height: calc(100dvh - 136px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    transform: translateY(-50%);
-    translate: 0 16px;
-    opacity: 0; pointer-events: none;
-    border: 1px solid var(--line); border-radius: 18px;
-    box-shadow: 0 18px 50px -18px rgba(0, 0, 0, .55);
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: auto; height: auto; max-height: 82vh;
+    transform: translateY(103%);
+    opacity: 1; pointer-events: none;
+    border: 0; border-top: 1px solid var(--line);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -10px 44px -22px rgba(0, 0, 0, .5);
     overflow: hidden;
-    z-index: 50;
+    z-index: 48;
+    transition: transform .2s cubic-bezier(.4,0,.2,1), opacity .2s;
   }
   /* 权重需与基础规则 body.nav-open #sidebar 一致，否则 transform 被覆盖 */
-  body.nav-open #sidebar { transform: translateY(-50%); translate: 0 0; opacity: 1; pointer-events: auto; }
-  #backdrop { inset: 0; z-index: 30; }
+  body.nav-open #sidebar { transform: translateY(0); pointer-events: auto; }
+  #backdrop { inset: 0; z-index: 47; }
 
   #content { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
   .to-top { bottom: calc(118px + env(safe-area-inset-bottom)); right: calc(14px + var(--sbw, 0px)); }
