@@ -9,6 +9,7 @@
   var themeBtn = document.getElementById('themeBtn');
   var backdrop = document.getElementById('backdrop');
   var docTitle = document.getElementById('docTitle');
+  var wakeBtn = document.getElementById('wakeBtn');
   var progressBar = document.querySelector('#progress span');
   var toTop = document.getElementById('toTop');
 
@@ -35,6 +36,66 @@
     applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
   });
   initTheme();
+
+  /* ---------- 屏幕常亮（Wake Lock） ---------- */
+  var wakeLock = null;
+  var wakeWanted = false;
+
+  function updateWakeBtn() {
+    if (!wakeBtn) return;
+    var supported = 'wakeLock' in navigator;
+    wakeBtn.disabled = !supported;
+    wakeBtn.classList.toggle('on', !!wakeLock);
+    wakeBtn.setAttribute('aria-pressed', wakeLock ? 'true' : 'false');
+    wakeBtn.title = !supported ? '当前浏览器不支持屏幕常亮' : (wakeLock ? '屏幕常亮：已开' : '屏幕常亮：已关');
+  }
+  function acquireWake(report) {
+    if (!('wakeLock' in navigator)) {
+      if (report) showToast({ icon: '💡', title: '不支持屏幕常亮', text: '请用较新的 Safari 或 Chrome 打开' });
+      return;
+    }
+    navigator.wakeLock.request('screen').then(function (lock) {
+      wakeLock = lock;
+      lock.addEventListener('release', function () { wakeLock = null; updateWakeBtn(); });
+      updateWakeBtn();
+      if (report) showToast({ icon: '💡', title: '屏幕常亮已开', text: '看食谱时不会熄屏' });
+    }).catch(function (err) {
+      wakeLock = null;
+      updateWakeBtn();
+      if (report) showToast({ icon: '⚠️', title: '无法开启常亮', text: (err && err.message) || '浏览器限制' });
+    });
+  }
+  function releaseWake() {
+    if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
+    updateWakeBtn();
+  }
+
+  if (wakeBtn) {
+    try { wakeWanted = localStorage.getItem('wake') === '1'; } catch (e) {}
+    updateWakeBtn();
+
+    wakeBtn.addEventListener('click', function () {
+      if (!('wakeLock' in navigator)) {
+        showToast({ icon: '💡', title: '不支持屏幕常亮', text: '请用较新的 Safari 或 Chrome 打开' });
+        return;
+      }
+      wakeWanted = !wakeWanted;
+      try { localStorage.setItem('wake', wakeWanted ? '1' : '0'); } catch (e) {}
+      if (wakeWanted) acquireWake(true);
+      else { releaseWake(); showToast({ icon: '🌙', title: '屏幕常亮已关' }); }
+    });
+
+    // 页面重新可见时，续上（系统在隐藏时会自动释放）
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible' && wakeWanted && !wakeLock) acquireWake(false);
+    });
+    // 首次交互时补一次（请求 Wake Lock 常需要用户手势）
+    var retry = function () { if (wakeWanted && !wakeLock) acquireWake(false); };
+    document.addEventListener('pointerdown', retry, { passive: true });
+    document.addEventListener('keydown', retry);
+
+    if (wakeWanted) acquireWake(false);
+  }
 
   /* ---------- 工具 ---------- */
   function escapeHtml(s) {

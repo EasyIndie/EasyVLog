@@ -108,6 +108,8 @@ button, a, input, .group-head, .pin, .icon-btn, .to-top { touch-action: manipula
 }
 .icon-btn:hover { border-color: var(--accent-line); background: var(--accent-soft); }
 .icon-btn:active { transform: scale(.96); }
+.icon-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.icon-btn:disabled { opacity: .35; cursor: not-allowed; }
 
 #progress {
   position: fixed; left: 0; right: 0;
