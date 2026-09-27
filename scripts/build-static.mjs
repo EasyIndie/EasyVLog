@@ -11,7 +11,7 @@
  *
  * 用法:
  *   node scripts/build-static.mjs                  # 部署用，base 由 --base 决定
- *   node scripts/build-static.mjs --base /easyvlog/ --out _site
+ *   node scripts/build-static.mjs --base /EasyVLog/ --out _site
  *   node scripts/build-static.mjs --base / --out _site   # 本地预览
  *
  * 前置：先跑 build-recipes / build-index / build-site（生成 site.json）。
@@ -32,7 +32,7 @@ function arg(name, fallback) {
   const i = process.argv.indexOf('--' + name);
   return i > -1 && process.argv[i + 1] ? process.argv[i + 1] : fallback;
 }
-const BASE = arg('base', '/easyvlog/').replace(/\/?$/, '/');
+const BASE = arg('base', '/EasyVLog/').replace(/\/?$/, '/');
 /* 用 resolve 而不是 join：join 会把 '/tmp/x' 拼成 '<root>/tmp/x' */
 const OUT = resolve(root, arg('out', '_site'));
 const VERSION = process.env.GITHUB_SHA ? process.env.GITHUB_SHA.slice(0, 7) : 'dev';

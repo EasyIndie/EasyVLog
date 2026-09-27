@@ -68,7 +68,7 @@ node scripts/new-recipe.mjs "韭菜鸡蛋胡萝卜包" --category "包子"
 
 ## 在线查看（手机可看）
 
-发布地址：**https://easyindie.github.io/easyvlog/**
+发布地址：**https://easyindie.github.io/EasyVLog/**
 
 - 手机打开默认进入**「今日要做」**那道菜（置顶高亮）；可搜索、可打印。
 - 手机上导航在**底部标签栏**（目录 / 今日 / 食谱 / 脚本），「目录」为底部上滑面板；桌面端为左侧栏常驻。
@@ -104,7 +104,7 @@ node scripts/set-today.mjs "花卷" --note "第 02 集"
 ```bash
 ./scripts/preview.sh
 node --check assets/app.js && node --check sw.js
-node scripts/build-static.mjs --base /easyvlog/ --out _site   # 含导航断言
+node scripts/build-static.mjs --base /EasyVLog/ --out _site   # 含导航断言
 ```
 人工过一遍：手机目录上滑/计时器/底部标签、桌面侧栏、深浅色切换不闪白、键盘 Tab、打印预览、断网刷新。
 

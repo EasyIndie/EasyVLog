@@ -7,7 +7,7 @@
  */
 var VERSION = '__V__';
 var BASE = '__BASE__';
-var CACHE = 'easyvlog-' + VERSION;
+var CACHE = 'EasyVLog-' + VERSION;
 
 var SHELL = [
   BASE,

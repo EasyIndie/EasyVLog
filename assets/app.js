@@ -144,7 +144,7 @@
     return b.replace(/\/?$/, '/');
   })();
   function encodePath(p) { return p.split('/').map(encodeURIComponent).join('/'); }
-  /** 文档路径 -> 可分享的页面 URL（'05-食谱库/花卷.md' -> '/easyvlog/05-食谱库/花卷/'） */
+  /** 文档路径 -> 可分享的页面 URL（'05-食谱库/花卷.md' -> '/EasyVLog/05-食谱库/花卷/'） */
   function docUrl(path) { return BASE + encodePath(path.replace(/\.md$/, '/')); }
   /** 文档路径 -> 原始 Markdown 的 URL */
   function mdUrl(path) { return BASE + encodePath(path); }

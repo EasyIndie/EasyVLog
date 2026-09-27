@@ -33,7 +33,7 @@ jobs:
           node scripts/build-site.mjs
 
       - name: 静态化并组装站点
-        run: node scripts/build-static.mjs --base /easyvlog/ --out _site
+        run: node scripts/build-static.mjs --base /EasyVLog/ --out _site
 
       - name: 压缩 CSS / JS（失败不影响发布）
         continue-on-error: true
