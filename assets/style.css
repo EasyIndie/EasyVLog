@@ -111,6 +111,16 @@ button, a, input, .group-head, .pin, .icon-btn, .to-top { touch-action: manipula
 .icon-btn:active { transform: scale(.96); }
 .icon-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+/* 顶栏计时按钮（桌面） */
+.icon-btn.timer { display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+.icon-btn.timer .tb-ico { font-size: 18px; line-height: 1; }
+.icon-btn.timer .tb-time { display: none; font-size: 13px; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.icon-btn.timer.has-timers, .icon-btn.timer.done { width: auto; padding: 0 11px; }
+.icon-btn.timer.has-timers { background: var(--accent); border-color: var(--accent); color: #fff; }
+.icon-btn.timer.has-timers .tb-time { display: inline; }
+.icon-btn.timer.done { background: #d9534f; border-color: #d9534f; color: #fff; }
+.icon-btn.timer.ringing { animation: fabPulse .7s ease-in-out infinite; }
+
 #progress {
   position: fixed; left: 0; right: 0;
   top: calc(var(--topbar-h) + env(safe-area-inset-top));
@@ -132,14 +142,21 @@ button, a, input, .group-head, .pin, .icon-btn, .to-top { touch-action: manipula
   background: var(--surface);
   border-right: 1px solid var(--line);
   transform: translateX(-103%);
-  transition: transform .24s cubic-bezier(.4,0,.2,1);
+  transition: transform .24s cubic-bezier(.4,0,.2,1), opacity .2s;
   z-index: 35;
   display: flex; flex-direction: column;
 }
 body.nav-open #sidebar { transform: translateX(0); }
 
 .sidebar-inner { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-.sidebar-head { padding: 12px; border-bottom: 1px solid var(--line); }
+.sidebar-head { display: flex; align-items: center; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); }
+.sidebar-head .search-wrap { flex: 1; }
+.sheet-close {
+  display: none; width: 40px; height: 40px; flex: none;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface-2); color: var(--ink); font-size: 16px; cursor: pointer;
+  touch-action: manipulation;
+}
 
 .search-wrap {
   display: flex; align-items: center; gap: 8px;
@@ -155,7 +172,13 @@ body.nav-open #sidebar { transform: translateX(0); }
   padding: 11px 0; font-size: 16px; color: var(--ink);
 }
 
-#nav { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 8px 16px; }
+#nav { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 8px 8px 16px; scrollbar-width: thin; scrollbar-color: transparent transparent; }
+#nav:hover, #nav.scrolling { scrollbar-color: var(--line) transparent; }
+#nav::-webkit-scrollbar { width: 8px; height: 8px; }
+#nav::-webkit-scrollbar-track { background: transparent; }
+#nav::-webkit-scrollbar-thumb { background: transparent; border-radius: 8px; }
+#nav:hover::-webkit-scrollbar-thumb, #nav.scrolling::-webkit-scrollbar-thumb { background: var(--line); }
+#nav::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 /* 分组（可折叠） */
 .group { margin: 3px 0; }
@@ -378,18 +401,21 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 @media (max-width: 959px) {
   .tabbar { display: flex; }
   .sheet-handle { display: block; }
+  .sheet-close { display: grid; place-items: center; }
 
   #sidebar {
-    top: auto; bottom: 0; left: 0; right: 0;
-    width: auto; max-height: 84vh;
-    border-right: 0; border-top: 1px solid var(--line);
-    border-radius: 18px 18px 0 0;
-    transform: translateY(103%);
-    box-shadow: 0 -16px 48px -16px rgba(0, 0, 0, .5);
+    top: auto; bottom: calc(58px + env(safe-area-inset-bottom));
+    left: 10px; right: 10px;
+    width: auto; max-height: 70vh;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    transform: translateY(20px);
+    opacity: 0; pointer-events: none;
+    box-shadow: 0 18px 50px -18px rgba(0, 0, 0, .55);
     overflow: hidden;
     z-index: 50;
   }
-  body.nav-open #sidebar { transform: translateY(0); }
+  body.nav-open #sidebar { transform: translateY(0); opacity: 1; pointer-events: auto; }
   #backdrop { inset: 0; z-index: 30; }
 
   #content { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
@@ -410,15 +436,12 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 .dur .dur-ico { font-size: .9em; opacity: .85; }
 
 .timer-fab {
-  position: fixed; right: 20px; bottom: 24px; z-index: 46;
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  padding: 12px 15px; border-radius: 999px;
-  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-  font: inherit; font-size: 15px; font-weight: 600; cursor: pointer;
-  box-shadow: var(--shadow); touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+  display: none; /* 桌面隐藏，改用顶栏按钮 */
+  align-items: center; justify-content: center;
+  font: inherit; font-weight: 600; cursor: pointer;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
-.timer-fab .fab-ico { font-size: 17px; line-height: 1; }
+.timer-fab .fab-ico { line-height: 1; }
 .timer-fab .fab-time { font-variant-numeric: tabular-nums; letter-spacing: .02em; line-height: 1; }
 .timer-fab.has-timers { background: var(--accent); color: #fff; border-color: var(--accent); }
 .timer-fab.done { background: #d9534f; color: #fff; border-color: #d9534f; }
@@ -486,7 +509,10 @@ body.timer-open .timer-panel { opacity: 1; pointer-events: auto; transform: tran
 }
 
 @media (max-width: 959px) {
+  #timerBtn { display: none !important; }
   .timer-fab {
+    display: inline-flex;
+    position: fixed; z-index: 46;
     left: 50%; right: auto; margin-left: -31px;
     bottom: calc(9px + env(safe-area-inset-bottom));
     width: 62px; height: 62px; padding: 0; gap: 0;

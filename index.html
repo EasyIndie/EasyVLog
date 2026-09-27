@@ -21,6 +21,10 @@
       </span>
     </div>
     <div class="actions">
+      <button id="timerBtn" class="icon-btn timer" type="button" aria-label="计时器" title="计时器">
+        <span class="tb-ico" aria-hidden="true">⏱</span>
+        <span id="timerBtnTime" class="tb-time"></span>
+      </button>
       <button id="wakeBtn" class="icon-btn" aria-label="屏幕常亮" aria-pressed="false" title="屏幕常亮" hidden>☀</button>
       <button id="themeBtn" class="icon-btn" aria-label="切换深色模式" title="深浅色">◐</button>
       <button id="printBtn" class="icon-btn" aria-label="打印本篇" title="打印">⎙</button>
@@ -37,6 +41,7 @@
             <span aria-hidden="true">⌕</span>
             <input id="search" type="search" placeholder="搜索食谱 / 脚本…" autocomplete="off">
           </label>
+          <button id="navClose" class="sheet-close" type="button" aria-label="关闭目录">✕</button>
         </div>
         <nav id="nav"></nav>
         <div class="sidebar-foot">

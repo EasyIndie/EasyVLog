@@ -7,6 +7,7 @@
   var menuBtn = document.getElementById('menuBtn');
   var sidebarEl = document.getElementById('sidebar');
   var tabbar = document.querySelector('.tabbar');
+  var navClose = document.getElementById('navClose');
   var printBtn = document.getElementById('printBtn');
   var themeBtn = document.getElementById('themeBtn');
   var backdrop = document.getElementById('backdrop');
@@ -430,7 +431,10 @@
       var btn = e.target && e.target.closest ? e.target.closest('.tab') : null;
       if (!btn) return;
       var action = btn.dataset.action;
-      if (action === 'nav') { openNav(); return; }
+      if (action === 'nav') {
+        document.body.classList.contains('nav-open') ? closeNav() : openNav();
+        return;
+      }
       closeNav();
       if (action === 'today') go(SITE && SITE.today && SITE.today.path);
       else if (action === 'recipes') go(firstPath('05-食谱库/00'));
@@ -467,6 +471,17 @@
   })();
 
   backdrop.addEventListener('click', closeNav);
+  if (navClose) navClose.addEventListener('click', closeNav);
+
+  /* 目录滚动时才显示滚动条 */
+  if (nav) {
+    var navScrollTimer = null;
+    nav.addEventListener('scroll', function () {
+      nav.classList.add('scrolling');
+      clearTimeout(navScrollTimer);
+      navScrollTimer = setTimeout(function () { nav.classList.remove('scrolling'); }, 700);
+    }, { passive: true });
+  }
   window.addEventListener('hashchange', function () {
     var p = decodeHash();
     if (p && /\.md$/.test(p)) navigate(p);
@@ -483,6 +498,8 @@
   var audioCtx = null;
   var timerFab = document.getElementById('timerFab');
   var timerFabTime = document.getElementById('timerFabTime');
+  var timerBtn = document.getElementById('timerBtn');
+  var timerBtnTime = document.getElementById('timerBtnTime');
   var timerPanel = document.getElementById('timerPanel');
   var timerBackdrop = document.getElementById('timerBackdrop');
   var timerList = document.getElementById('timerList');
@@ -551,10 +568,11 @@
     beep(3);
     if (navigator.vibrate) { try { navigator.vibrate([250, 120, 250, 120, 250]); } catch (e) {} }
     showToast({ icon: '⏰', title: '时间到', text: t.label, ms: 9000 });
-    if (timerFab) {
-      timerFab.classList.add('ringing');
-      setTimeout(function () { timerFab.classList.remove('ringing'); }, 9000);
-    }
+    [timerFab, timerBtn].forEach(function (el) {
+      if (!el) return;
+      el.classList.add('ringing');
+      setTimeout(function () { el.classList.remove('ringing'); }, 9000);
+    });
   }
 
   function findTimer(id) { for (var i = 0; i < timers.length; i++) if (timers[i].id === id) return timers[i]; return null; }
@@ -621,26 +639,25 @@
     });
   }
   function updateFab() {
-    if (!timerFab) return;
     var running = timers.filter(function (t) { return !t.done && t.endAt; });
     var paused = timers.filter(function (t) { return !t.done && !t.endAt; });
     var done = timers.filter(function (t) { return t.done; });
-    if (running.length) {
-      timerFab.classList.add('has-timers');
-      timerFab.classList.remove('done');
-      timerFabTime.textContent = fmtClock(Math.min.apply(null, running.map(remainOf)));
-    } else if (paused.length) {
-      timerFab.classList.add('has-timers');
-      timerFab.classList.remove('done');
-      timerFabTime.textContent = fmtClock(Math.min.apply(null, paused.map(remainOf)));
-    } else if (done.length) {
-      timerFab.classList.remove('has-timers');
-      timerFab.classList.add('done');
-      timerFabTime.textContent = '完成';
-    } else {
-      timerFab.classList.remove('has-timers');
-      timerFab.classList.remove('done');
-      timerFabTime.textContent = '';
+    var state, text = '';
+    if (running.length) { state = 'run'; text = fmtClock(Math.min.apply(null, running.map(remainOf))); }
+    else if (paused.length) { state = 'pause'; text = fmtClock(Math.min.apply(null, paused.map(remainOf))); }
+    else if (done.length) { state = 'done'; }
+    else { state = 'idle'; }
+
+    var showTime = (state === 'run' || state === 'pause');
+    if (timerFab) {
+      timerFab.classList.toggle('has-timers', showTime);
+      timerFab.classList.toggle('done', state === 'done');
+      if (timerFabTime) timerFabTime.textContent = showTime ? text : (state === 'done' ? '完成' : '');
+    }
+    if (timerBtn) {
+      timerBtn.classList.toggle('has-timers', showTime);
+      timerBtn.classList.toggle('done', state === 'done');
+      if (timerBtnTime) timerBtnTime.textContent = showTime ? text : '';
     }
   }
   function renderTimers() {
@@ -758,6 +775,9 @@
 
   /* 计时器事件 */
   if (timerFab) timerFab.addEventListener('click', function () {
+    document.body.classList.contains('timer-open') ? closeTimerPanel() : openTimerPanel();
+  });
+  if (timerBtn) timerBtn.addEventListener('click', function () {
     document.body.classList.contains('timer-open') ? closeTimerPanel() : openTimerPanel();
   });
   if (timerClose) timerClose.addEventListener('click', closeTimerPanel);
