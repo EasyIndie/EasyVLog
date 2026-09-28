@@ -68,7 +68,7 @@
 | `assets/favicon.*` `assets/icon-*.png` `assets/og.png` | 站点图标与分享图（用 `scripts/make-icons.py` 生成） | 生成物（已提交） |
 | `LICENSE` | 内容 CC BY-NC-SA 4.0 / 代码 MIT | 手写 |
 | `.github/workflows/deploy-pages.yml` | 推 main 自动重建并部署 Pages | 手写 |
-| `scripts/` | 生成索引、脚手架、站点、查看工具 | 代码 |
+| `scripts/` | 生成索引、脚手架、站点、预览/监听、查看工具 | 代码 |
 | `.pi/prompts/` | 斜杠命令（`/new-episode` 等） | 手写 |
 | `.pi/skills/` | pi 技能，按需加载 | 手写 |
 
@@ -102,8 +102,10 @@ node scripts/build-site.mjs       # 在线站导航
 **改完站点（`index.html` / `assets/` / `sw.js`），本地验证：**
 ```bash
 ./scripts/preview.sh              # 构建到 _site/ 并起服务，再开 http://127.0.0.1:8000
+./scripts/preview.sh --watch      # 常驻：改源文件自动重建，刷新浏览器即可
 ```
 注意：`index.html` 现在是**模板**（带 `__BASE__` 等占位符），直接双击打开不会正常工作。
+`--watch` 由 `scripts/watch.mjs` 监听源文件（Markdown / assets / index.html / data），防抖后重跑构建；`_site/` 是产物、已在 `.gitignore`。
 
 ---
 
@@ -208,7 +210,7 @@ node scripts/new-episode.mjs "标题" --series "今天做______"
 | `node scripts/new-recipe.mjs "名称"` | 新建食谱卡 |
 | `node scripts/build-site.mjs` | 重建在线站导航（`site.json`） |
 | `node scripts/build-static.mjs` | 静态化：把每篇文档渲染成真 HTML 并组装 `_site/` |
-| `./scripts/preview.sh [端口]` | 本地构建 + 预览站点 |
+| `./scripts/preview.sh [端口] [--watch]` | 本地构建 + 预览站点（`--watch` 改动自动重建） |
 | `python3 scripts/make-icons.py` | 重新生成 favicon / PWA 图标 / 分享图 |
 | `node scripts/set-today.mjs "名称"` | 设置「今日要做」（置顶高亮） |
 | `git push`（main） | 触发 Actions 自动重建并部署 Pages |

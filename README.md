@@ -90,9 +90,12 @@ node scripts/set-today.mjs "花卷" --note "第 02 集"
 **直接双击仓库里的 `index.html` 没用**（占位符没替换），请用：
 
 ```bash
-./scripts/preview.sh          # 构建到 _site/ 并起服务，默认 http://127.0.0.1:8000
-./scripts/preview.sh 8080     # 指定端口
+./scripts/preview.sh              # 构建到 _site/ 并起服务，默认 http://127.0.0.1:8000
+./scripts/preview.sh 8080         # 指定端口
+./scripts/preview.sh --watch      # 常驻：改源文件自动重建，刷新浏览器即可
 ```
+
+`--watch` 下静态服务不用重启，只重建 `_site/`；`_site/` 在 `.gitignore` 里，不会污染仓库。
 
 ---
 

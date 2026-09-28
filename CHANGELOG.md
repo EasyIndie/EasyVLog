@@ -5,6 +5,14 @@
 
 ---
 
+## 2026-09-28（工具：preview.sh 新增 --watch）
+
+- `./scripts/preview.sh --watch`：本地起服务后监听源文件（Markdown / assets / index.html / data），改动自动重建 `_site/`，服务不重启，浏览器刷新即可。
+- 新增 `scripts/watch.mjs`（`fs.watch` + 防抖 + 串行构建）；`preview.sh` 用 `trap` 管住后台静态服务，Ctrl+C 一并退出。
+- 日常改内容不再需要 commit/push 才能看效果；push 只用于更新线上 Pages。
+
+---
+
 ## 2026-09-28（调性：确定「不出镜 + 无人声」的呈现方式）
 
 - 呈现方式定为：本人**不出镜**、视频**不配人声**；信息全部由**字幕**承载，音频只用可选背景音（BGM 或现场环境声），也可完全静音。
