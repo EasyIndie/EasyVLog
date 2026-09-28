@@ -5,6 +5,37 @@
 
 ---
 
+## 2026-09-28（工具：把常用操作做成 pi 斜杠命令）
+
+- 新增 8 个 `.pi/prompts/` 命令，常用构建 / 预览 / 提交 / 内容操作可直接在 pi 里调：
+  - 开发：`/build`、`/preview`、`/stop-preview`、`/check`、`/ship`、`/icons`
+  - 创作：`/add-topic`、`/set-today`
+- 新增 `scripts/stop-preview.sh`：先停 `watch.mjs`，再停静态服务与 `preview.sh`。
+- 已有 `/new-recipe`、`/new-episode`、`/review-episode`、`/weekly-review` 保留；修正 `/review-episode` 的检查项编号与顺序。
+- `AGENTS.md` 第 3 节、`创作指南.md`、`开发指南.md` 都加了命令清单；新增命令后需 `/reload`。
+
+---
+
+## 2026-09-28（结构：目录合并与文档精简）
+
+- **目录归并**：`04-运营记录/` 并入 `01-账号规划/` 并改名 `01-创作/`；`05-食谱库/` → `03-食谱库/`；取消 `docs/`，两份指南移到仓库根。最终内容目录只剩 `01-创作 / 02-分集脚本 / 03-食谱库`。
+- **文档合并**：`02-选题与栏目.md` + `03-拍摄发布SOP.md` → `01-创作/02-选题与拍摄.md`；发布复盘 → `01-创作/03-发布与复盘表.md`。
+- **精简**：`AGENTS.md` 去掉正文写作细则（只留护栏 + 分流 + front matter 契约）；`README.md` 改为纯分流入口；`01-定位与调性.md` 去掉一次性排查表与冗余，五节化；新增两份指南控制在 ~80 行。
+- **站点导航**改为 总览 / 创作 / 食谱库 / 分集脚本 / 开发；`build-static` 按 `site.json` 自动拷贝导航里的顶层文件与目录，不再硬编码。
+- 所有引用、脚本（`build-recipes` / `build-site` / `new-recipe` / `set-today` / `watch` / `app.js`）已同步新路径。
+
+---
+
+## 2026-09-28（结构：按读者拆分文档，创作/开发隔离）
+
+- 原来 `README.md` 与 `AGENTS.md` 把「做饭拍视频」和「改站点构建」的内容混在一起。
+- 新增两份面向不同读者的指南：`docs/创作指南.md`（定位/流程/约定）、`docs/开发指南.md`（构建管线/预览/部署）。
+- `README.md` 改为**分流入口**（你是创作者还是开发者），不再展开构建细节。
+- `AGENTS.md` 改为 **AI 入口**：保留第 2 节护栏、第 5 节 front matter 数据契约；新增第 3 节「两条线（先分流）」与第 4 节目录职责的**归属**列；写作/工作流/命令分别下沉到两份指南。
+- `build-site.mjs` 增加「指南」导航分区；`build-static.mjs` 改为自动拷贝导航里出现的顶层目录（不再硬编码 `01`~`05`）；`watch.mjs` 监听 `docs/`。
+
+---
+
 ## 2026-09-28（工具：preview.sh 新增 --watch）
 
 - `./scripts/preview.sh --watch`：本地起服务后监听源文件（Markdown / assets / index.html / data），改动自动重建 `_site/`，服务不重启，浏览器刷新即可。

@@ -40,3 +40,6 @@ raw/
 
 # 构建产物（CI 与本地预览生成）
 _site/
+
+# 本地预览进程号（preview.sh 写，stop-preview.sh 读）
+.preview.pid
