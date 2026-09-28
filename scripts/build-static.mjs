@@ -108,11 +108,13 @@ for (const sec of SITE.sections) {
 
 /* ---------------- 2. 构建断言（P3-6） ---------------- */
 const seen = new Set();
+const titleByPath = new Map();
 for (const d of docs) {
   if (!check(/\.md$/.test(d.path), `导航项不是 Markdown：${d.path}`)) continue;
   if (!check(existsSync(join(root, d.path)), `导航项指向的文件不存在：${d.path}`)) continue;
   if (!check(!seen.has(d.path), `导航项重复：${d.path}`)) continue;
   seen.add(d.path);
+  titleByPath.set(d.path, d.title);
 }
 if (docs.length === 0) errors.push('site.json 里没有任何文档');
 if (errors.length) {
@@ -132,7 +134,8 @@ function decodeEntities(s) {
 /*
  * 文档之间常用行内代码写相对路径（如 `../05-食谱库/花卷.md`）。
  * 这样在编辑器里可点，但站点上只会渲染成 <code>，点不动。
- * 这里在构建期把「能解析到站内文档」的行内代码包成真链接，源码不用改。
+ * 这里在构建期把「能解析到站内文档」的行内代码换成真链接，
+ * 链接文字用页面的正常标题（路径保留在 title 提示里），源码不用改。
  */
 function linkifyDocPaths(html, docPath) {
   // 先挪走围栏代码块与已有链接：前者里的路径不是链接，后者避免嵌套 <a>
@@ -147,7 +150,8 @@ function linkifyDocPaths(html, docPath) {
     if (/^[a-z][a-z0-9+.-]*:|^\//i.test(text)) return m; // 外链 / 绝对路径不接管
     const target = resolveDoc(text, docPath);
     if (!seen.has(target)) return m;
-    return `<a class="doc-link" href="${esc(pageUrl(target))}" data-doc="${esc(target)}"><code>${inner}</code></a>`;
+    const name = titleByPath.get(target) || target;
+    return `<a class="doc-link" href="${esc(pageUrl(target))}" data-doc="${esc(target)}" title="${esc(text)}">${esc(name)}</a>`;
   });
   return html.replace(/\u0000keep(\d+)\u0000/g, (m, i) => keep[+i]);
 }

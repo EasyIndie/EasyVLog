@@ -555,8 +555,9 @@
   /*
    * 文档之间常用行内代码写相对路径（如 `../05-食谱库/花卷.md`）。
    * 编辑器里可点，但站点上前端渲染出来只是 <code>，点不动。
-   * 这里把它们包成真链接，再交给 wireLink 解析路由。
-   * 构建期渲染的页面已经处理过，那时 code 已在 <a> 里，会跳过。
+   * 这里把它们换成真链接，链接文字用页面标题（路径保留在 title 提示里），
+   * 再交给 wireLink 解析路由。
+   * 构建期渲染的页面已经处理过，那时已经没有待处理的 code，会跳过。
    */
   function linkifyDocPaths(root, path) {
     if (!root) return;
@@ -570,8 +571,9 @@
       var a = document.createElement('a');
       a.className = 'doc-link';
       a.setAttribute('href', text);
-      code.parentNode.insertBefore(a, code);
-      a.appendChild(code);
+      a.setAttribute('title', text);
+      a.textContent = titles[target];
+      code.parentNode.replaceChild(a, code);
     });
   }
 
