@@ -123,6 +123,45 @@ if (errors.length) {
   process.exit(1);
 }
 
+/* ---------------- 2.5 内部文档链接自检 ---------------- */
+/*
+ * 作者用相对路径写文档间链接（`../01-食谱收集/花卷.md`）。
+ * 构建期只把**能解析到站内文档**的引用转成 <a>，解析不了就静默变成 <code>，
+ * 于是目录一改名/移动，链接就悄悄失效——历史上已经重犯好几次。
+ * 这里把“引用了仓库里真实存在的文档、却没转成链接”当成构建错误，宁可构建失败也不发出去。
+ */
+const LINK_ALLOW = [
+  /(^|\/)AGENTS\.md$/, /(^|\/)CHANGELOG\.md$/, /(^|\/)LICENSE$/, /(^|\/)README\.md$/,
+  /(^|\/)_[^/]*\.md$/, // 模板（_模板.md / _template.md）
+  /(^|\/)第NN集-标题\.md$/, // 占位名
+  /^\.[^/]*\//, // .pi/ .github/ 等点目录
+  /^(scripts|assets|data)\//,
+];
+const linkAllowed = (p) => LINK_ALLOW.some((re) => re.test(p));
+const linkErrors = [];
+for (const doc of seen) {
+  const body = stripFrontMatter(readText(doc)).replace(/```[\s\S]*?```/g, '');
+  const refs = new Set();
+  for (const m of body.matchAll(/`([^`]+\.md(?:[#?][^\s`]*)?)`/g)) refs.add(m[1].trim());
+  for (const m of body.matchAll(/\]\(([^)\s]+\.md(?:[#?][^)\s]*)?)\)/g)) refs.add(m[1].trim());
+  for (const text of refs) {
+    if (/^[a-z][a-z0-9+.-]*:|^\//i.test(text)) continue;
+    const rel = resolveDoc(text, doc);
+    if (seen.has(rel)) continue;
+    const rootp = text.replace(/^\.\//, '');
+    const realDoc = seen.has(rootp) || existsSync(join(root, rootp)) || existsSync(join(root, rel));
+    if (realDoc && !linkAllowed(rootp) && !linkAllowed(rel)) {
+      linkErrors.push(`${doc}: \`${text}\`${seen.has(rootp) ? `（应是 ${rootp} 的可用相对路径，如 ../${rootp}）` : ''}`);
+    }
+  }
+}
+if (linkErrors.length) {
+  console.error('✗ 文档里有引用了真实文档、却拼不对路径、因此跳不过去的链接：');
+  linkErrors.forEach((e) => console.error('  · ' + e));
+  console.error('  （修好相对路径，或把该文件加入 scripts/build-static.mjs 的 LINK_ALLOW）');
+  process.exit(1);
+}
+
 /* ---------------- 3. 渲染 Markdown ---------------- */
 /** 还原 marked 转义过的实体，便于把行内代码里的路径当链接解析 */
 function decodeEntities(s) {

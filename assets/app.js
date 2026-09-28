@@ -1373,7 +1373,7 @@
   /* ---------- Service Worker（离线可看） ---------- */
   if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
     window.addEventListener('load', function () {
-      navigator.serviceWorker.register(BASE + 'sw.js', { scope: BASE }).catch(function () {});
+      navigator.serviceWorker.register(BASE + 'sw.js', { scope: BASE, updateViaCache: 'none' }).catch(function () {});
     });
   }
 

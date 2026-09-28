@@ -53,8 +53,10 @@ self.addEventListener('fetch', function (e) {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.indexOf(BASE) !== 0) return;
 
-  /* 页面导航：网络优先，断网时回落到缓存（离线也能翻上次看过的页） */
-  if (req.mode === 'navigate') {
+  /* 页面导航与 Markdown：网络优先，避免目录/内容更新后拿到旧页/旧文；断网才回落缓存 */
+  var isNav = req.mode === 'navigate';
+  var isDoc = !isNav && /\.md$/.test(url.pathname);
+  if (isNav || isDoc) {
     e.respondWith((async function () {
       try {
         var res = await fetch(req);
@@ -64,9 +66,12 @@ self.addEventListener('fetch', function (e) {
         }
         return res;
       } catch (err) {
-        var hit = (await caches.match(req)) || (await caches.match(BASE)) ||
-          (await caches.match(BASE + 'index.html'));
+        var hit = await caches.match(req);
         if (hit) return hit;
+        if (isNav) {
+          hit = (await caches.match(BASE)) || (await caches.match(BASE + 'index.html'));
+          if (hit) return hit;
+        }
         throw err;
       }
     })());
