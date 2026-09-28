@@ -62,10 +62,18 @@ const sections = [
     items: [{ title: '项目总览', path: 'README.md' }],
   },
   {
+    title: '创作',
+    icon: 'clipboard-list',
+    items: [
+      { title: '创作指南', path: '创作指南.md' },
+      ...listDir('01-创作', { order: ['01-定位与调性.md'] }),
+    ],
+  },
+  {
     title: '食谱库',
     icon: 'book-open',
     highlight: true,
-    items: listDir('05-食谱库', { order: ['00-食谱索引.md'] }),
+    items: listDir('03-食谱库', { order: ['00-食谱索引.md'] }),
   },
   {
     title: '分集脚本',
@@ -73,14 +81,9 @@ const sections = [
     items: listDir('02-分集脚本', { order: ['00-分集索引.md'] }),
   },
   {
-    title: '账号规划',
-    icon: 'clipboard-list',
-    items: listDir('01-账号规划', { order: ['01-定位与调性.md'] }),
-  },
-  {
-    title: '运营记录',
-    icon: 'bar-chart-3',
-    items: listDir('04-运营记录'),
+    title: '开发',
+    icon: 'list',
+    items: [{ title: '开发指南', path: '开发指南.md' }],
   },
 ].filter((s) => s.items.length > 0);
 

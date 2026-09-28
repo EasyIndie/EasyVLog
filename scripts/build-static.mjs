@@ -6,7 +6,7 @@
  *   之前 index.html 的正文是空的，内容全靠浏览器 fetch Markdown 再渲染，
  *   搜索引擎/社交爬虫抓到的是一张骨架屏，等于没有 SEO。
  *   这里在构建期把每篇文档渲染成真正的 HTML，写到
- *     <out>/05-食谱库/韭菜鸡蛋胡萝卜包/index.html
+ *     <out>/03-食谱库/韭菜鸡蛋胡萝卜包/index.html
  *   前端 app.js 再渐进增强（接管跳转、加计时芯片），不再负责首次渲染。
  *
  * 用法:
@@ -64,7 +64,7 @@ function stripFrontMatter(md) {
 function encodePath(p) {
   return p.split('/').map(encodeURIComponent).join('/');
 }
-/** 文档路径 -> 页面目录名（'05-食谱库/花卷.md' -> '05-食谱库/花卷/'） */
+/** 文档路径 -> 页面目录名（'03-食谱库/花卷.md' -> '03-食谱库/花卷/'） */
 function pagePath(docPath) {
   return docPath.replace(/\.md$/, '/');
 }
@@ -132,7 +132,7 @@ function decodeEntities(s) {
     .replace(/&amp;/g, '&');
 }
 /*
- * 文档之间常用行内代码写相对路径（如 `../05-食谱库/花卷.md`）。
+ * 文档之间常用行内代码写相对路径（如 `../03-食谱库/花卷.md`）。
  * 这样在编辑器里可点，但站点上只会渲染成 <code>，点不动。
  * 这里在构建期把「能解析到站内文档」的行内代码换成真链接，
  * 链接文字用页面的正常标题（路径保留在 title 提示里），源码不用改。
@@ -279,7 +279,7 @@ function insertMetaBar(html, fm) {
 }
 
 function buildJsonLd({ fm, docPath, title, ingredients, steps }) {
-  const isRecipe = docPath.startsWith('05-食谱库/');
+  const isRecipe = docPath.startsWith('03-食谱库/');
   const url = SITE_ORIGIN + pageUrl(docPath);
   if (isRecipe && ingredients.length && steps.length) {
     return {
@@ -365,11 +365,17 @@ for (const f of ['site.json', 'manifest.webmanifest', 'robots.txt', '404.html', 
 // 6.2 静态资源
 cpSync(join(root, 'assets'), join(OUT, 'assets'), { recursive: true });
 // 6.3 原始 Markdown（前端切换文档时还要 fetch 它们）
-if (existsSync(join(root, 'README.md'))) cpSync(join(root, 'README.md'), join(OUT, 'README.md'));
-for (const entry of readdirSync(root)) {
-  if (!/^(0[1-5])-/.test(entry)) continue;
-  if (!statSync(join(root, entry)).isDirectory()) continue;
-  cpSync(join(root, entry), join(OUT, entry), { recursive: true });
+// 按 seen 拷贝，不硬编码目录：顶层文件（README.md、创作指南.md…）逐个拷，顶层目录整包拷。
+for (const p of seen) {
+  if (p.includes('/')) continue; // 目录里的文件随所属目录整包拷
+  if (existsSync(join(root, p))) cpSync(join(root, p), join(OUT, p));
+}
+const topDirs = new Set(
+  [...seen].map((p) => p.split('/')[0]).filter((d) => d && !d.includes('.'))
+);
+for (const d of topDirs) {
+  const src = join(root, d);
+  if (existsSync(src) && statSync(src).isDirectory()) cpSync(src, join(OUT, d), { recursive: true });
 }
 // 6.4 清掉模板
 function rmTemplates(dir) {
@@ -413,7 +419,7 @@ for (const docPath of seen) {
 // 6.6 首页：默认展示「今日要做」，没有就展示食谱索引
 const homeDoc = (SITE.today && SITE.today.path && seen.has(SITE.today.path))
   ? SITE.today.path
-  : (docs.find((d) => d.path.indexOf('05-食谱库/00') === 0) || docs[0]).path;
+  : (docs.find((d) => d.path.indexOf('03-食谱库/00') === 0) || docs[0]).path;
 const homeHtml = makePage(homeDoc);
 validatePage(homeHtml, 'index.html');
 writeFileSync(join(OUT, 'index.html'), homeHtml);

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 由 05-食谱库 各食谱的 front matter 生成 00-食谱索引.md
+ * 由 03-食谱库 各食谱的 front matter 生成 00-食谱索引.md
  * 归属：私人食谱库（核心）
  * 用法: node scripts/build-recipes.mjs
  */
@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { readMarkdownDir, fmtDuration } from './lib/frontmatter.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const dir = join(root, '05-食谱库');
+const dir = join(root, '03-食谱库');
 const indexPath = join(dir, '00-食谱索引.md');
 
 const entries = readMarkdownDir(dir, { exclude: ['00-食谱索引.md'] });
