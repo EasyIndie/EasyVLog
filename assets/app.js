@@ -144,7 +144,7 @@
     return b.replace(/\/?$/, '/');
   })();
   function encodePath(p) { return p.split('/').map(encodeURIComponent).join('/'); }
-  /** 文档路径 -> 可分享的页面 URL（'03-食谱库/花卷.md' -> '/EasyVLog/03-食谱库/花卷/'） */
+  /** 文档路径 -> 可分享的页面 URL（'01-食谱收集/花卷.md' -> '/EasyVLog/01-食谱收集/花卷/'） */
   function docUrl(path) { return BASE + encodePath(path.replace(/\.md$/, '/')); }
   /** 文档路径 -> 原始 Markdown 的 URL */
   function mdUrl(path) { return BASE + encodePath(path); }
@@ -246,8 +246,8 @@
     tabbar.querySelectorAll('.tab').forEach(function (b) {
       var a = b.dataset.action, on = false;
       if (a === 'today') on = !!(SITE && SITE.today && path === SITE.today.path);
-      else if (a === 'recipes') on = path.indexOf('03-食谱库/') === 0;
-      else if (a === 'scripts') on = path.indexOf('02-分集脚本/') === 0;
+      else if (a === 'recipes') on = path.indexOf('01-食谱收集/') === 0;
+      else if (a === 'scripts') on = path.indexOf('02-视频脚本/') === 0;
       b.classList.toggle('active', on);
     });
   }
@@ -553,7 +553,7 @@
   }
 
   /*
-   * 文档之间常用行内代码写相对路径（如 `../03-食谱库/花卷.md`）。
+   * 文档之间常用行内代码写相对路径（如 `../01-食谱收集/花卷.md`）。
    * 编辑器里可点，但站点上前端渲染出来只是 <code>，点不动。
    * 这里把它们换成真链接，链接文字用页面标题（路径保留在 title 提示里），
    * 再交给 wireLink 解析路由。
@@ -752,8 +752,8 @@
       }
       closeNav();
       if (action === 'today') go(SITE && SITE.today && SITE.today.path);
-      else if (action === 'recipes') go(firstPath('03-食谱库/00'));
-      else if (action === 'scripts') go(firstPath('02-分集脚本/00'));
+      else if (action === 'recipes') go(firstPath('01-食谱收集/00'));
+      else if (action === 'scripts') go(firstPath('02-视频脚本/00'));
     });
   }
 
@@ -823,7 +823,7 @@
       navScrollTimer = setTimeout(function () { nav.classList.remove('scrolling'); }, 700);
     }, { passive: true });
   }
-  /* 老式 hash 链接（#03-食谱库/xxx.md）兼容：进来就静默换成新地址 */
+  /* 老式 hash 链接（#01-食谱收集/xxx.md）兼容：进来就静默换成新地址 */
   window.addEventListener('hashchange', function () {
     var p = decodeHash();
     if (p && /\.md$/.test(p) && titles[p]) go(p);
@@ -1267,7 +1267,7 @@
   /* ---------- 启动 ---------- */
   function homePath() {
     if (SITE.today && SITE.today.path && titles[SITE.today.path]) return SITE.today.path;
-    var a = allLinks.find(function (l) { return l.dataset.path.indexOf('03-食谱库/00') === 0; });
+    var a = allLinks.find(function (l) { return l.dataset.path.indexOf('01-食谱收集/00') === 0; });
     return (a || allLinks[0]).dataset.path;
   }
 
@@ -1296,7 +1296,7 @@
     var fromUrl = docFromLocation();
     if (fromUrl && titles[fromUrl]) target = fromUrl;
 
-    // 2) 兼容老的 hash 链接（#03-食谱库/xxx.md），静默换成新地址
+    // 2) 兼容老的 hash 链接（#01-食谱收集/xxx.md），静默换成新地址
     if (!target) {
       var h = decodeHash();
       if (h && titles[h]) {

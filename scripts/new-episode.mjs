@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const scriptsDir = join(root, '02-分集脚本');
+const scriptsDir = join(root, '02-视频脚本');
 const templatePath = join(scriptsDir, '_template.md');
 const backlogPath = join(root, 'data', 'backlog.json');
 
@@ -76,7 +76,7 @@ if (existsSync(filePath)) {
 
 // 套模板
 if (!existsSync(templatePath)) {
-  console.error('❌ 缺少 02-分集脚本/_template.md');
+  console.error('❌ 缺少 02-视频脚本/_template.md');
   process.exit(1);
 }
 const today = new Date().toISOString().slice(0, 10);

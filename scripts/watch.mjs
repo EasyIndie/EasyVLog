@@ -12,8 +12,8 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 /* 构建输入。注意不要把产物 _site/ 放进来，否则构建会触发下一轮构建 */
-const WATCH_DIRS = ['02-分集脚本', '03-食谱库', '01-创作', 'assets', 'data'];
-const WATCH_FILES = ['index.html', 'sw.js', 'README.md', 'AGENTS.md', '创作指南.md', '开发指南.md'];
+const WATCH_DIRS = ['01-食谱收集', '02-视频脚本', '03-创作指南', '04-开发指南', 'assets', 'data'];
+const WATCH_FILES = ['index.html', 'sw.js', 'AGENTS.md'];
 
 /* 一次重建 = preview.sh 里的四步，顺序不能乱 */
 const BUILD = [

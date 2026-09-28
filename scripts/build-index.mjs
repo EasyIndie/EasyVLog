@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 由分集脚本的 YAML front matter + data/backlog.json 生成 00-分集索引.md
+ * 由视频脚本的 YAML front matter + data/backlog.json 生成 00-脚本索引.md
  * 归属：对外运营（可选）
  * 用法: node scripts/build-index.mjs
  */
@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url';
 import { parseFrontMatter } from './lib/frontmatter.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const scriptsDir = join(root, '02-分集脚本');
-const indexPath = join(scriptsDir, '00-分集索引.md');
+const scriptsDir = join(root, '02-视频脚本');
+const indexPath = join(scriptsDir, '00-脚本索引.md');
 const backlogPath = join(root, 'data', 'backlog.json');
 
 const { readdirSync } = await import('node:fs');
@@ -46,7 +46,7 @@ const badge = (s) => `${statusEmoji[s] || '•'} ${s || '脚本'}`;
 const pad = (n) => String(n).padStart(2, '0');
 const today = new Date().toISOString().slice(0, 10);
 
-let out = `# 00 · 分集索引\n\n`;
+let out = `# 00 · 脚本索引\n\n`;
 out += `> **对外运营（可选）**｜⚠️ 本文件由 \`scripts/build-index.mjs\` 自动生成，**不要手改**。\n`;
 out += `> 数据来源：各集 md 的 front matter + \`data/backlog.json\`\n`;
 out += `> 重建命令：\`node scripts/build-index.mjs\`　｜　最后生成：${today}\n\n`;

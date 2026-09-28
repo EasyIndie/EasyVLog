@@ -57,33 +57,27 @@ function listDir(dir, { order = [], exclude = [] } = {}) {
 
 const sections = [
   {
-    title: '总览',
-    icon: 'info',
-    items: [{ title: '项目总览', path: 'README.md' }],
-  },
-  {
-    title: '创作',
-    icon: 'clipboard-list',
-    items: [
-      { title: '创作指南', path: '创作指南.md' },
-      ...listDir('01-创作', { order: ['01-定位与调性.md'] }),
-    ],
-  },
-  {
-    title: '食谱库',
+    title: '食谱收集',
     icon: 'book-open',
     highlight: true,
-    items: listDir('03-食谱库', { order: ['00-食谱索引.md'] }),
+    items: listDir('01-食谱收集', { order: ['00-食谱索引.md'] }),
   },
   {
-    title: '分集脚本',
+    title: '视频脚本',
     icon: 'clapperboard',
-    items: listDir('02-分集脚本', { order: ['00-分集索引.md'] }),
+    items: listDir('02-视频脚本', { order: ['00-脚本索引.md'] }),
   },
   {
-    title: '开发',
+    title: '创作指南',
+    icon: 'clipboard-list',
+    items: listDir('03-创作指南', {
+      order: ['创作指南.md', '01-定位与调性.md', '02-选题与拍摄.md', '03-发布与复盘.md'],
+    }),
+  },
+  {
+    title: '开发指南',
     icon: 'list',
-    items: [{ title: '开发指南', path: '开发指南.md' }],
+    items: listDir('04-开发指南', { order: ['开发指南.md'] }),
   },
 ].filter((s) => s.items.length > 0);
 

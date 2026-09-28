@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { parseFrontMatter } from './lib/frontmatter.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const dir = join(root, '03-食谱库');
+const dir = join(root, '01-食谱收集');
 const templatePath = join(dir, '_模板.md');
 
 const argv = process.argv.slice(2);
@@ -52,7 +52,7 @@ if (existsSync(filePath)) {
   process.exit(1);
 }
 if (!existsSync(templatePath)) {
-  console.error('❌ 缺少 03-食谱库/_模板.md');
+  console.error('❌ 缺少 01-食谱收集/_模板.md');
   process.exit(1);
 }
 

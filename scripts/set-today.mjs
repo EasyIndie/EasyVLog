@@ -4,7 +4,7 @@
  * 用法:
  *   node scripts/set-today.mjs "韭菜鸡蛋胡萝卜包"
  *   node scripts/set-today.mjs "韭菜" --note "第 01 集 · 没有粉丝版"
- *   node scripts/set-today.mjs "03-食谱库/花卷.md"
+ *   node scripts/set-today.mjs "01-食谱收集/花卷.md"
  *   node scripts/set-today.mjs --clear
  */
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
@@ -42,7 +42,7 @@ if (!query) {
 }
 
 // 收集所有可选的 md（食谱库优先）
-const searchDirs = ['03-食谱库', '02-分集脚本', '01-创作'];
+const searchDirs = ['01-食谱收集', '02-视频脚本', '03-创作指南'];
 const candidates = [];
 for (const dir of searchDirs) {
   const full = join(root, dir);
