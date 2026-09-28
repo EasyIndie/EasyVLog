@@ -552,6 +552,29 @@
     });
   }
 
+  /*
+   * 文档之间常用行内代码写相对路径（如 `../05-食谱库/花卷.md`）。
+   * 编辑器里可点，但站点上前端渲染出来只是 <code>，点不动。
+   * 这里把它们包成真链接，再交给 wireLink 解析路由。
+   * 构建期渲染的页面已经处理过，那时 code 已在 <a> 里，会跳过。
+   */
+  function linkifyDocPaths(root, path) {
+    if (!root) return;
+    Array.prototype.forEach.call(root.querySelectorAll('code'), function (code) {
+      if (code.closest('pre') || code.closest('a')) return;
+      var text = code.textContent.trim();
+      if (!/\.md(?:[#?][^\s]*)?$/.test(text)) return;
+      if (/^[a-z][a-z0-9+.-]*:|^\//i.test(text)) return;
+      var target = resolve(safeDecode(text.split('#')[0].split('?')[0]), path);
+      if (!titles[target]) return;
+      var a = document.createElement('a');
+      a.className = 'doc-link';
+      a.setAttribute('href', text);
+      code.parentNode.insertBefore(a, code);
+      a.appendChild(code);
+    });
+  }
+
   /** 内容已就位后的接线（预渲染页与前端渲染共用） */
   function hydrate(path) {
     /* 表格外靁套两层：.table-wrap 负责定位 + 右缘渐隐，.table-x 负责横向滚动。
@@ -574,6 +597,7 @@
       if (!img.getAttribute('loading')) img.setAttribute('loading', 'lazy');
       if (!img.getAttribute('decoding')) img.setAttribute('decoding', 'async');
     });
+    linkifyDocPaths(content, path);
     content.querySelectorAll('a[href]').forEach(function (a) { wireLink(a, path); });
 
     if (!content.querySelector('.today-banner') && SITE.today && SITE.today.path === path) {

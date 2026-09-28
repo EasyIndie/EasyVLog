@@ -299,6 +299,8 @@ body.nav-open #backdrop { opacity: 1; pointer-events: auto; }
 .md h3 { font-size: 1.15em; font-weight: 600; margin: 1.7em 0 .55em; }
 .md p { margin: .75em 0; }
 .md a { text-underline-offset: 3px; }
+/* 行内代码写的文档路径：构建/渲染期包成 a.doc-link，让它看起来能点 */
+.md a.doc-link code { color: var(--accent); }
 .md strong { color: var(--accent-ink); font-weight: 650; }
 .md ul, .md ol { padding-left: 1.4em; margin: .7em 0; }
 .md li { margin: .35em 0; }

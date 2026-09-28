@@ -122,6 +122,35 @@ if (errors.length) {
 }
 
 /* ---------------- 3. 渲染 Markdown ---------------- */
+/** 还原 marked 转义过的实体，便于把行内代码里的路径当链接解析 */
+function decodeEntities(s) {
+  return String(s)
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&');
+}
+/*
+ * 文档之间常用行内代码写相对路径（如 `../05-食谱库/花卷.md`）。
+ * 这样在编辑器里可点，但站点上只会渲染成 <code>，点不动。
+ * 这里在构建期把「能解析到站内文档」的行内代码包成真链接，源码不用改。
+ */
+function linkifyDocPaths(html, docPath) {
+  // 先挪走围栏代码块与已有链接：前者里的路径不是链接，后者避免嵌套 <a>
+  const keep = [];
+  const stash = (m) => { keep.push(m); return `\u0000keep${keep.length - 1}\u0000`; };
+  html = html.replace(/<pre>[\s\S]*?<\/pre>/g, stash);
+  html = html.replace(/<a\s[^>]*>[\s\S]*?<\/a>/g, stash);
+  html = html.replace(/<code>([\s\S]*?)<\/code>/g, (m, inner) => {
+    if (inner.indexOf('<') !== -1) return m; // 只处理纯文本代码
+    const text = decodeEntities(inner).trim();
+    if (!/\.md(?:[#?][^\s]*)?$/.test(text)) return m;
+    if (/^[a-z][a-z0-9+.-]*:|^\//i.test(text)) return m; // 外链 / 绝对路径不接管
+    const target = resolveDoc(text, docPath);
+    if (!seen.has(target)) return m;
+    return `<a class="doc-link" href="${esc(pageUrl(target))}" data-doc="${esc(target)}"><code>${inner}</code></a>`;
+  });
+  return html.replace(/\u0000keep(\d+)\u0000/g, (m, i) => keep[+i]);
+}
 function renderMarkdown(mdText, docPath) {
   const html = marked.parse(stripFrontMatter(mdText));
   let out = html;
@@ -153,6 +182,9 @@ function renderMarkdown(mdText, docPath) {
     if (!seen.has(target)) return m;
     return `<a href="${esc(pageUrl(target))}" data-doc="${esc(target)}"${rest}>`;
   });
+
+  // 行内代码里的文档路径 -> 可点链接（源码仍是相对路径，编辑器照样能点）
+  out = linkifyDocPaths(out, docPath);
 
   // 图片：懒加载 + 预留尺寸位置，防 CLS
   out = out.replace(/<img\s([^>]*?)\/?>/g, (m, attrs) => {
