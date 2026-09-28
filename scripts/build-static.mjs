@@ -155,10 +155,16 @@ for (const doc of seen) {
     }
   }
 }
+/* 站点外壳（index.html）里硬编码的 GitHub 目录链接，也要跟着目录改名走 */
+for (const m of readText('index.html').matchAll(/https:\/\/github\.com\/EasyIndie\/EasyVLog\/(?:tree|blob)\/main\/([^"'\s<)]+)/g)) {
+  let p = m[1].split('#')[0].split('?')[0];
+  try { p = decodeURIComponent(p); } catch { /* 解不开就按原样查 */ }
+  if (!existsSync(join(root, p))) linkErrors.push(`index.html：GitHub 链接指向不存在的路径 \`${p}\``);
+}
 if (linkErrors.length) {
-  console.error('✗ 文档里有引用了真实文档、却拼不对路径、因此跳不过去的链接：');
+  console.error('✗ 有引用了真实文件、却拼不对路径、因此跳不过去的链接：');
   linkErrors.forEach((e) => console.error('  · ' + e));
-  console.error('  （修好相对路径，或把该文件加入 scripts/build-static.mjs 的 LINK_ALLOW）');
+  console.error('  （修好路径，或把该文件加入 scripts/build-static.mjs 的 LINK_ALLOW）');
   process.exit(1);
 }
 
