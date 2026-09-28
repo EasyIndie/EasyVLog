@@ -10,6 +10,14 @@ import { parseFrontMatter } from './lib/frontmatter.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
+function fmOf(dir, file) {
+  try {
+    return parseFrontMatter(readFileSync(join(root, dir, file), 'utf8')) || {};
+  } catch {
+    return {};
+  }
+}
+
 function titleOf(dir, file) {
   const raw = readFileSync(join(root, dir, file), 'utf8');
   const fm = parseFrontMatter(raw);
@@ -19,6 +27,23 @@ function titleOf(dir, file) {
   return file.replace(/\.md$/, '');
 }
 
+/*
+ * 文件名（第01集、花卷、韭菜鸡蛋…）按中文/数字排序都不等于“创建顺序”，
+ * 站点目录里就会出现「花卷」排在「韭菜鸡蛋胡萝卜包」前面这种错位。
+ * 以 front matter 的 id 为准（同一目录内唯一、递增），没有 id 的再按名称排。
+ */
+function byIdThenName(dir) {
+  return (a, b) => {
+    const ia = Number(fmOf(dir, a).id);
+    const ib = Number(fmOf(dir, b).id);
+    const hasA = Number.isFinite(ia);
+    const hasB = Number.isFinite(ib);
+    if (hasA && hasB && ia !== ib) return ia - ib;
+    if (hasA !== hasB) return hasA ? -1 : 1;
+    return a.localeCompare(b, 'zh');
+  };
+}
+
 function listDir(dir, { order = [], exclude = [] } = {}) {
   const full = join(root, dir);
   if (!existsSync(full)) return [];
@@ -26,7 +51,7 @@ function listDir(dir, { order = [], exclude = [] } = {}) {
     (f) => f.endsWith('.md') && !f.startsWith('_') && !exclude.includes(f)
   );
   const ordered = order.filter((f) => files.includes(f));
-  const rest = files.filter((f) => !ordered.includes(f)).sort((a, b) => a.localeCompare(b, 'zh'));
+  const rest = files.filter((f) => !ordered.includes(f)).sort(byIdThenName(dir));
   return [...ordered, ...rest].map((f) => ({ title: titleOf(dir, f), path: `${dir}/${f}` }));
 }
 
